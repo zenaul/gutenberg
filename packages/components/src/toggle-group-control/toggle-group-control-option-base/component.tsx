@@ -11,6 +11,7 @@ import { motion, useReducedMotion } from 'framer-motion';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -79,14 +80,18 @@ function ToggleGroupControlOptionBase(
 	};
 
 	const isActive = radioProps.state === value;
+
 	const cx = useCx();
-	const labelViewClasses = cx( isBlock && styles.labelBlock );
-	const classes = cx(
-		styles.buttonView,
-		className,
-		isActive && styles.buttonActive
+	const labelViewClasses = useMemo(
+		() => cx( isBlock && styles.labelBlock ),
+		[ cx, isBlock ]
 	);
-	const backdropClassname = cx( styles.backdropView );
+	const radioClasses = useMemo(
+		() =>
+			cx( styles.buttonView, className, isActive && styles.buttonActive ),
+		[ cx, className, isActive ]
+	);
+	const backdropClasses = useMemo( () => cx( styles.backdropView ), [ cx ] );
 
 	return (
 		<LabelView className={ labelViewClasses } data-active={ isActive }>
@@ -98,7 +103,7 @@ function ToggleGroupControlOptionBase(
 					{ ...radioProps }
 					as="button"
 					aria-label={ radioProps[ 'aria-label' ] }
-					className={ classes }
+					className={ radioClasses }
 					data-value={ value }
 					ref={ forwardedRef }
 					value={ value }
@@ -108,7 +113,7 @@ function ToggleGroupControlOptionBase(
 				{ /* Animated backdrop using framer motion's shared layout animation */ }
 				{ isActive ? (
 					<motion.div
-						className={ backdropClassname }
+						className={ backdropClasses }
 						transition={
 							shouldReduceMotion
 								? REDUCED_MOTION_TRANSITION_CONFIG
