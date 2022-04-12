@@ -6,7 +6,7 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { CONFIG, COLORS, reduceMotion } from '../../utils';
+import { CONFIG, COLORS } from '../../utils';
 
 export const toggleGroupControl = css`
 	background: ${ COLORS.ui.background };
@@ -18,8 +18,6 @@ export const toggleGroupControl = css`
 	min-width: 0;
 	padding: 2px;
 	position: relative;
-	transition: transform ${ CONFIG.transitionDurationFastest } linear;
-	${ reduceMotion( 'transition' ) }
 	&:hover {
 		border-color: ${ COLORS.ui.borderHover };
 	}
