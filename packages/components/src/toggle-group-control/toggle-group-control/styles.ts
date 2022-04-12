@@ -8,7 +8,7 @@ import { css } from '@emotion/react';
  */
 import { CONFIG, COLORS, reduceMotion } from '../../utils';
 
-export const ToggleGroupControl = css`
+export const toggleGroupControl = css`
 	background: ${ COLORS.ui.background };
 	border: 1px solid;
 	border-color: ${ COLORS.ui.border };

@@ -75,7 +75,7 @@ function ToggleGroupControl(
 	const classes = useMemo(
 		() =>
 			cx(
-				styles.ToggleGroupControl,
+				styles.toggleGroupControl,
 				isBlock && styles.block,
 				'medium',
 				className
