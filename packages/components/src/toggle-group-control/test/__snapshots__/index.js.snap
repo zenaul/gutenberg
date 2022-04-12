@@ -32,14 +32,6 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
   min-width: 0;
   padding: 2px;
   position: relative;
-  -webkit-transition: -webkit-transform 100ms linear;
-  transition: transform 100ms linear;
-}
-
-@media ( prefers-reduced-motion: reduce ) {
-  .emotion-6 {
-    transition-duration: 0ms;
-  }
 }
 
 .emotion-6:hover {
@@ -54,25 +46,6 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
 }
 
 .emotion-8 {
-  background: #1e1e1e;
-  border-radius: 2px;
-  box-shadow: transparent;
-  left: 0;
-  position: absolute;
-  top: 2px;
-  bottom: 2px;
-  -webkit-transition: -webkit-transform 160ms ease;
-  transition: transform 160ms ease;
-  z-index: 1;
-}
-
-@media ( prefers-reduced-motion: reduce ) {
-  .emotion-8 {
-    transition-duration: 0ms;
-  }
-}
-
-.emotion-10 {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -85,7 +58,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
   flex: 1;
 }
 
-.emotion-12 {
+.emotion-10 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -126,30 +99,41 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
 }
 
 @media ( prefers-reduced-motion: reduce ) {
-  .emotion-12 {
+  .emotion-10 {
     transition-duration: 0ms;
   }
 }
 
-.emotion-12::-moz-focus-inner {
+.emotion-10::-moz-focus-inner {
   border: 0;
 }
 
-.emotion-12:active {
+.emotion-10:active {
   background: #fff;
 }
 
-.emotion-13 {
+.emotion-11 {
   color: #fff;
 }
 
-.emotion-13:active {
+.emotion-11:active {
   background: transparent;
 }
 
-.emotion-14 {
+.emotion-12 {
   font-size: 13px;
   line-height: 1;
+}
+
+.emotion-14 {
+  background: #1e1e1e;
+  border-radius: 2px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
 }
 
 <div
@@ -173,26 +157,14 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
       id="toggle-group-control-1"
       role="radiogroup"
     >
-      <iframe
-        aria-hidden="true"
-        frameborder="0"
-        src="about:blank"
-        style="display: block; opacity: 0; position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; overflow: hidden; pointer-events: none; z-index: -1;"
-        tabindex="-1"
-      />
       <div
         class="emotion-8 emotion-9"
-        role="presentation"
-        style="transform: translateX(0px); transition: none; width: 0px;"
-      />
-      <div
-        class="emotion-10 emotion-11"
         data-active="true"
       >
         <button
           aria-checked="true"
           aria-label="Uppercase"
-          class="emotion-12 components-toggle-group-control-option-base emotion-13"
+          class="emotion-10 components-toggle-group-control-option-base emotion-11"
           data-value="uppercase"
           data-wp-c16t="true"
           data-wp-component="ToggleGroupControlOptionBase"
@@ -201,7 +173,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
           tabindex="0"
         >
           <div
-            class="emotion-14 emotion-15"
+            class="emotion-12 emotion-13"
           >
             <svg
               aria-hidden="true"
@@ -217,15 +189,20 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
             </svg>
           </div>
         </button>
+        <div
+          class="emotion-14"
+          role="presentation"
+          style="opacity: 1;"
+        />
       </div>
       <div
-        class="emotion-10 emotion-11"
+        class="emotion-8 emotion-9"
         data-active="false"
       >
         <button
           aria-checked="false"
           aria-label="Lowercase"
-          class="emotion-12 components-toggle-group-control-option-base"
+          class="emotion-10 components-toggle-group-control-option-base"
           data-value="lowercase"
           data-wp-c16t="true"
           data-wp-component="ToggleGroupControlOptionBase"
@@ -234,7 +211,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
           tabindex="-1"
         >
           <div
-            class="emotion-14 emotion-15"
+            class="emotion-12 emotion-13"
           >
             <svg
               aria-hidden="true"
@@ -288,14 +265,6 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
   min-width: 0;
   padding: 2px;
   position: relative;
-  -webkit-transition: -webkit-transform 100ms linear;
-  transition: transform 100ms linear;
-}
-
-@media ( prefers-reduced-motion: reduce ) {
-  .emotion-6 {
-    transition-duration: 0ms;
-  }
 }
 
 .emotion-6:hover {
@@ -402,13 +371,6 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
       id="toggle-group-control-0"
       role="radiogroup"
     >
-      <iframe
-        aria-hidden="true"
-        frameborder="0"
-        src="about:blank"
-        style="display: block; opacity: 0; position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; overflow: hidden; pointer-events: none; z-index: -1;"
-        tabindex="-1"
-      />
       <div
         class="emotion-8 emotion-9"
         data-active="false"
