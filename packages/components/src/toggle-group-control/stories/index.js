@@ -185,3 +185,50 @@ export const WithReset = () => {
 		</View>
 	);
 };
+
+// TODO: remove before merging
+export const DoubleToggles = () => {
+	const aligns = [ 'Left', 'Center', 'Right' ];
+	const quantities = [ 'One', 'Two', 'Three', 'Four' ];
+
+	const [ alignState, setAlignState ] = useState();
+	const [ quantityState, setQuantityState ] = useState();
+
+	return (
+		<View>
+			<ToggleGroupControl
+				onChange={ setAlignState }
+				value={ alignState }
+				label={ 'Pick an alignment option' }
+			>
+				{ aligns.map( ( key ) => (
+					<ToggleGroupControlOption
+						key={ key }
+						value={ key }
+						label={ key }
+					/>
+				) ) }
+			</ToggleGroupControl>
+			<Button onClick={ () => setAlignState( undefined ) } isTertiary>
+				Reset
+			</Button>
+
+			<ToggleGroupControl
+				onChange={ setQuantityState }
+				value={ quantityState }
+				label={ 'Pick a quantity' }
+			>
+				{ quantities.map( ( key ) => (
+					<ToggleGroupControlOption
+						key={ key }
+						value={ key }
+						label={ key }
+					/>
+				) ) }
+			</ToggleGroupControl>
+			<Button onClick={ () => setQuantityState( undefined ) } isTertiary>
+				Reset
+			</Button>
+		</View>
+	);
+};
