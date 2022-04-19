@@ -2,6 +2,8 @@
  * External dependencies
  */
 import { boolean, text } from '@storybook/addon-knobs';
+// eslint-disable-next-line no-restricted-imports
+import { motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -19,6 +21,7 @@ import {
 } from '../index';
 import { View } from '../../view';
 import Button from '../../button';
+import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 
 export default {
 	component: ToggleGroupControl,
@@ -230,5 +233,46 @@ export const DoubleToggles = () => {
 				Reset
 			</Button>
 		</View>
+	);
+};
+
+// TODO: Remove before merging as well.
+const { Fill: InspectorControls, Slot } = createSlotFill( 'InspectorControls' );
+InspectorControls.Slot = Slot;
+export const RenderViaSlot = () => {
+	const [ alignState, setAlignState ] = useState();
+	const aligns = [ 'Left', 'Center', 'Right' ];
+
+	return (
+		<SlotFillProvider>
+			{ /* This motion.div element breaks the `ToggleGroupControl` backdrop,
+			 * because motion registers it as the "motion parent" of the backdrop
+			 * (even if the `ToggleGroupControl` gets rendered in another part of the
+			 * tree via Slot/Fill)
+			 */ }
+			<motion.div>
+				<InspectorControls>
+					<ToggleGroupControl
+						onChange={ setAlignState }
+						value={ alignState }
+						label={ 'Pick an alignment option' }
+					>
+						{ aligns.map( ( key ) => (
+							<ToggleGroupControlOption
+								key={ key }
+								value={ key }
+								label={ key }
+							/>
+						) ) }
+					</ToggleGroupControl>
+				</InspectorControls>
+			</motion.div>
+			<View>
+				<InspectorControls.Slot bubblesVirtually />
+				<Button onClick={ () => setAlignState( undefined ) } isTertiary>
+					Reset
+				</Button>
+			</View>
+		</SlotFillProvider>
 	);
 };
