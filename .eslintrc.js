@@ -225,7 +225,7 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'packages/components/src/**/*.js' ],
+			files: [ 'packages/components/src/**/*.[tj]s?(x)' ]
 			excludedFiles: [ ...developmentFiles ],
 			rules: {
 				'react-hooks/exhaustive-deps': 'warn',
