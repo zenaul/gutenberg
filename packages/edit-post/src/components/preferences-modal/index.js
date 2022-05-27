@@ -7,7 +7,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -70,6 +70,13 @@ export default function EditPostPreferencesModal() {
 		},
 		[ isLargeViewport ]
 	);
+	const colorContrastCheckedLevel = useSelect( ( select ) => {
+		const { isFeatureActive } = select( editPostStore );
+		const strictColorContrastChecksEnabled = isFeatureActive(
+			'strictColorContrastChecks'
+		);
+		return strictColorContrastChecksEnabled ? 'AAA' : 'AA';
+	}, [] );
 	const sections = useMemo(
 		() => [
 			{
@@ -147,8 +154,9 @@ export default function EditPostPreferencesModal() {
 							) }
 							<EnableFeature
 								featureName="strictColorContrastChecks"
-								help={ __(
-									'Switches the color contrast checker to be more strict, complying with WCAG AAA guidelines instead of WCAG AA.'
+								help={ sprintf(
+									'Switches the color contrast checker to be comply with WCAG AAA guidelines instead of WCAG AA. Currently checking for: %s.',
+									colorContrastCheckedLevel
 								) }
 								label={ __( 'Strict color-contrast checker' ) }
 							/>
