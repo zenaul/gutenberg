@@ -54,7 +54,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
               />
               <WithSelect(WithDispatch(BaseOption))
                 featureName="strictColorContrastChecks"
-                help="Makes the color contrast checker more strict, to comply with WCAG AAA guidelines."
+                help="Switches the color contrast checker to be comply with WCAG AAA guidelines instead of WCAG AA. Currently checking for: AAA."
                 label="Strict color-contrast checker"
               />
             </Section>
@@ -190,7 +190,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
               />
               <WithSelect(WithDispatch(BaseOption))
                 featureName="strictColorContrastChecks"
-                help="Makes the color contrast checker more strict, to comply with WCAG AAA guidelines."
+                help="Switches the color contrast checker to be comply with WCAG AAA guidelines instead of WCAG AA. Currently checking for: AAA."
                 label="Strict color-contrast checker"
               />
             </Section>
