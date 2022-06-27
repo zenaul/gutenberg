@@ -227,3 +227,63 @@ WP_Block_Supports::get_instance()->register(
 		'apply'              => 'gutenberg_apply_typography_support',
 	)
 );
+
+WP_Style_Engine_Gutenberg::register_block_style_definitions_metadata(
+	'typography',
+	array(
+		'fontSize'       => array(
+			'property_keys' => array(
+				'default' => 'font-size',
+			),
+			'path'          => array( 'typography', 'fontSize' ),
+			'classnames'    => array(
+				'has-$slug-font-size' => 'font-size',
+			),
+		),
+		'fontFamily'     => array(
+			'property_keys' => array(
+				'default' => 'font-family',
+			),
+			'path'          => array( 'typography', 'fontFamily' ),
+			'classnames'    => array(
+				'has-$slug-font-family' => 'font-family',
+			),
+		),
+		'fontStyle'      => array(
+			'property_keys' => array(
+				'default' => 'font-style',
+			),
+			'path'          => array( 'typography', 'fontStyle' ),
+		),
+		'fontWeight'     => array(
+			'property_keys' => array(
+				'default' => 'font-weight',
+			),
+			'path'          => array( 'typography', 'fontWeight' ),
+		),
+		'lineHeight'     => array(
+			'property_keys' => array(
+				'default' => 'line-height',
+			),
+			'path'          => array( 'typography', 'lineHeight' ),
+		),
+		'textDecoration' => array(
+			'property_keys' => array(
+				'default' => 'text-decoration',
+			),
+			'path'          => array( 'typography', 'textDecoration' ),
+		),
+		'textTransform'  => array(
+			'property_keys' => array(
+				'default' => 'text-transform',
+			),
+			'path'          => array( 'typography', 'textTransform' ),
+		),
+		'letterSpacing'  => array(
+			'property_keys' => array(
+				'default' => 'letter-spacing',
+			),
+			'path'          => array( 'typography', 'letterSpacing' ),
+		),
+	)
+);

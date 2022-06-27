@@ -42,178 +42,10 @@ class WP_Style_Engine {
 	 *  - property_keys => (array) array of keys whose values represent a valid CSS property, e.g., "margin" or "border".
 	 *  - path          => (array) a path that accesses the corresponding style value in the block style object.
 	 *  - value_func    => (string) the name of a function to generate an array of valid CSS rules for a particular style object.
+	 *
+	 * @var array
 	 */
-	const BLOCK_STYLE_DEFINITIONS_METADATA = array(
-		'color'      => array(
-			'text'       => array(
-				'property_keys' => array(
-					'default' => 'color',
-				),
-				'path'          => array( 'color', 'text' ),
-				'css_vars'      => array(
-					'--wp--preset--color--$slug' => 'color',
-				),
-				'classnames'    => array(
-					'has-text-color'  => true,
-					'has-$slug-color' => 'color',
-				),
-			),
-			'background' => array(
-				'property_keys' => array(
-					'default' => 'background-color',
-				),
-				'path'          => array( 'color', 'background' ),
-				'classnames'    => array(
-					'has-background'             => true,
-					'has-$slug-background-color' => 'color',
-				),
-			),
-			'gradient'   => array(
-				'property_keys' => array(
-					'default' => 'background',
-				),
-				'path'          => array( 'color', 'gradient' ),
-				'classnames'    => array(
-					'has-background'                => true,
-					'has-$slug-gradient-background' => 'gradient',
-				),
-			),
-		),
-		'border'     => array(
-			'color'  => array(
-				'property_keys' => array(
-					'default'    => 'border-color',
-					'individual' => 'border-%s-color',
-				),
-				'path'          => array( 'border', 'color' ),
-				'classnames'    => array(
-					'has-border-color'       => true,
-					'has-$slug-border-color' => 'color',
-				),
-			),
-			'radius' => array(
-				'property_keys' => array(
-					'default'    => 'border-radius',
-					'individual' => 'border-%s-radius',
-				),
-				'path'          => array( 'border', 'radius' ),
-			),
-			'style'  => array(
-				'property_keys' => array(
-					'default'    => 'border-style',
-					'individual' => 'border-%s-style',
-				),
-				'path'          => array( 'border', 'style' ),
-			),
-			'width'  => array(
-				'property_keys' => array(
-					'default'    => 'border-width',
-					'individual' => 'border-%s-width',
-				),
-				'path'          => array( 'border', 'width' ),
-			),
-			'top'    => array(
-				'value_func' => 'static::get_css_individual_property_rules',
-				'path'       => array( 'border', 'top' ),
-				'css_vars'   => array(
-					'color' => '--wp--preset--color--$slug',
-				),
-			),
-			'right'  => array(
-				'value_func' => 'static::get_css_individual_property_rules',
-				'path'       => array( 'border', 'right' ),
-				'css_vars'   => array(
-					'color' => '--wp--preset--color--$slug',
-				),
-			),
-			'bottom' => array(
-				'value_func' => 'static::get_css_individual_property_rules',
-				'path'       => array( 'border', 'bottom' ),
-				'css_vars'   => array(
-					'color' => '--wp--preset--color--$slug',
-				),
-			),
-			'left'   => array(
-				'value_func' => 'static::get_css_individual_property_rules',
-				'path'       => array( 'border', 'left' ),
-				'css_vars'   => array(
-					'color' => '--wp--preset--color--$slug',
-				),
-			),
-		),
-		'spacing'    => array(
-			'padding' => array(
-				'property_keys' => array(
-					'default'    => 'padding',
-					'individual' => 'padding-%s',
-				),
-				'path'          => array( 'spacing', 'padding' ),
-			),
-			'margin'  => array(
-				'property_keys' => array(
-					'default'    => 'margin',
-					'individual' => 'margin-%s',
-				),
-				'path'          => array( 'spacing', 'margin' ),
-			),
-		),
-		'typography' => array(
-			'fontSize'       => array(
-				'property_keys' => array(
-					'default' => 'font-size',
-				),
-				'path'          => array( 'typography', 'fontSize' ),
-				'classnames'    => array(
-					'has-$slug-font-size' => 'font-size',
-				),
-			),
-			'fontFamily'     => array(
-				'property_keys' => array(
-					'default' => 'font-family',
-				),
-				'path'          => array( 'typography', 'fontFamily' ),
-				'classnames'    => array(
-					'has-$slug-font-family' => 'font-family',
-				),
-			),
-			'fontStyle'      => array(
-				'property_keys' => array(
-					'default' => 'font-style',
-				),
-				'path'          => array( 'typography', 'fontStyle' ),
-			),
-			'fontWeight'     => array(
-				'property_keys' => array(
-					'default' => 'font-weight',
-				),
-				'path'          => array( 'typography', 'fontWeight' ),
-			),
-			'lineHeight'     => array(
-				'property_keys' => array(
-					'default' => 'line-height',
-				),
-				'path'          => array( 'typography', 'lineHeight' ),
-			),
-			'textDecoration' => array(
-				'property_keys' => array(
-					'default' => 'text-decoration',
-				),
-				'path'          => array( 'typography', 'textDecoration' ),
-			),
-			'textTransform'  => array(
-				'property_keys' => array(
-					'default' => 'text-transform',
-				),
-				'path'          => array( 'typography', 'textTransform' ),
-			),
-			'letterSpacing'  => array(
-				'property_keys' => array(
-					'default' => 'letter-spacing',
-				),
-				'path'          => array( 'typography', 'letterSpacing' ),
-			),
-		),
-	);
+	private static $block_style_definition_metadata = array();
 
 	/**
 	 * Utility method to retrieve the main instance of the class.
@@ -228,6 +60,28 @@ class WP_Style_Engine {
 		}
 
 		return self::$instance;
+	}
+
+	/**
+	 * Registers a style definition metadata for a defined path.
+	 * Adds the data to self::$block_style_definition_metadata.
+	 *
+	 * @param string $path The path to the style definition, in a dot-annotation format (e.g., "border.color").
+	 * @param array  $meta The style definition metadata.
+	 */
+	public static function register_block_style_definitions_metadata( $path = '', $meta = array() ) {
+		$result = array();
+		$keys   = explode( '.', $path );
+		$keys   = array_reverse( $keys );
+		$value  = $meta;
+		foreach ( $keys as $key ) {
+			// Wrap value with key over each iteration.
+			$value  = array(
+				$key => $value,
+			);
+			$result = array_merge_recursive( $result, $value );
+		}
+		self::$block_style_definition_metadata = array_merge_recursive( self::$block_style_definition_metadata, $result );
 	}
 
 	/**
@@ -269,7 +123,7 @@ class WP_Style_Engine {
 	 * Returns classnames, and generates classname(s) from a CSS preset property pattern, e.g., 'var:preset|color|heavenly-blue'.
 	 *
 	 * @param array         $style_value      A single raw style value or css preset property from the generate() $block_styles array.
-	 * @param array<string> $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+	 * @param array<string> $style_definition A single style definition from self::$block_style_definition_metadata.
 	 *
 	 * @return array        An array of CSS classnames.
 	 */
@@ -289,7 +143,7 @@ class WP_Style_Engine {
 				$slug = static::get_slug_from_preset_value( $style_value, $property_key );
 
 				if ( $slug ) {
-					// Right now we expect a classname pattern to be stored in BLOCK_STYLE_DEFINITIONS_METADATA.
+					// Right now we expect a classname pattern to be stored in self::$block_style_definition_metadata.
 					// One day, if there are no stored schemata, we could allow custom patterns or
 					// generate classnames based on other properties
 					// such as a path or a value or a prefix passed in options.
@@ -305,7 +159,7 @@ class WP_Style_Engine {
 	 * Returns CSS rules based on valid block style values.
 	 *
 	 * @param array         $style_value      A single raw style value from the generate() $block_styles array.
-	 * @param array<string> $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+	 * @param array<string> $style_definition A single style definition from self::$block_style_definition_metadata.
 	 * @param boolean       $should_return_css_vars Whether to try to build and return CSS var values.
 	 *
 	 * @return array        An array of CSS rules.
@@ -357,7 +211,7 @@ class WP_Style_Engine {
 
 	/**
 	 * Returns an CSS ruleset.
-	 * Styles are bundled based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
+	 * Styles are bundled based on the instructions in self::$block_style_definition_metadata.
 	 *
 	 * @param array $block_styles An array of styles from a block's attributes.
 	 * @param array $options array(
@@ -380,7 +234,7 @@ class WP_Style_Engine {
 		$should_return_css_vars = isset( $options['css_vars'] ) && true === $options['css_vars'];
 
 		// Collect CSS and classnames.
-		foreach ( self::BLOCK_STYLE_DEFINITIONS_METADATA as $definition_group_key => $definition_group_style ) {
+		foreach ( self::$block_style_definition_metadata as $definition_group_key => $definition_group_style ) {
 			if ( empty( $block_styles[ $definition_group_key ] ) ) {
 				continue;
 			}
@@ -441,7 +295,7 @@ class WP_Style_Engine {
 	 * "border-image-{outset|source|width|repeat|slice}: {value};"
 	 *
 	 * @param array $style_value                    A single raw Gutenberg style attributes value for a CSS property.
-	 * @param array $individual_property_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+	 * @param array $individual_property_definition A single style definition from self::$block_style_definition_metadata.
 	 *
 	 * @return array The class name for the added style.
 	 */
@@ -465,7 +319,7 @@ class WP_Style_Engine {
 
 			// Build a path to the individual rules in definitions.
 			$style_definition_path = array( $definition_group_key, $css_property );
-			$style_definition      = _wp_array_get( self::BLOCK_STYLE_DEFINITIONS_METADATA, $style_definition_path, null );
+			$style_definition      = _wp_array_get( self::$block_style_definition_metadata, $style_definition_path, null );
 
 			if ( $style_definition && isset( $style_definition['property_keys']['individual'] ) ) {
 				// Set a CSS var if there is a valid preset value.
@@ -489,7 +343,7 @@ class WP_Style_Engine {
  * Global public interface method to WP_Style_Engine->generate.
  *
  * Returns an CSS ruleset.
- * Styles are bundled based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
+ * Styles are bundled based on the instructions in self::$block_style_definition_metadata.
  *
  * Example usage:
  *

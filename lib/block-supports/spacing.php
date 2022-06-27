@@ -76,3 +76,23 @@ WP_Block_Supports::get_instance()->register(
 		'apply'              => 'gutenberg_apply_spacing_support',
 	)
 );
+
+WP_Style_Engine_Gutenberg::register_block_style_definitions_metadata(
+	'spacing',
+	array(
+		'padding' => array(
+			'property_keys' => array(
+				'default'    => 'padding',
+				'individual' => 'padding-%s',
+			),
+			'path'          => array( 'spacing', 'padding' ),
+		),
+		'margin'  => array(
+			'property_keys' => array(
+				'default'    => 'margin',
+				'individual' => 'margin-%s',
+			),
+			'path'          => array( 'spacing', 'margin' ),
+		),
+	)
+);

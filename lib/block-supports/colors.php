@@ -123,3 +123,49 @@ WP_Block_Supports::get_instance()->register(
 		'apply'              => 'gutenberg_apply_colors_support',
 	)
 );
+
+WP_Style_Engine_Gutenberg::register_block_style_definitions_metadata(
+	'color.text',
+	array(
+
+		'property_keys' => array(
+			'default' => 'color',
+		),
+		'path'          => array( 'color', 'text' ),
+		'css_vars'      => array(
+			'--wp--preset--color--$slug' => 'color',
+		),
+		'classnames'    => array(
+			'has-text-color'  => true,
+			'has-$slug-color' => 'color',
+		),
+	)
+);
+
+WP_Style_Engine_Gutenberg::register_block_style_definitions_metadata(
+	'color.background',
+	array(
+		'property_keys' => array(
+			'default' => 'background-color',
+		),
+		'path'          => array( 'color', 'background' ),
+		'classnames'    => array(
+			'has-background'             => true,
+			'has-$slug-background-color' => 'color',
+		),
+	)
+);
+
+WP_Style_Engine_Gutenberg::register_block_style_definitions_metadata(
+	'color.gradient',
+	array(
+		'property_keys' => array(
+			'default' => 'background',
+		),
+		'path'          => array( 'color', 'gradient' ),
+		'classnames'    => array(
+			'has-background'                => true,
+			'has-$slug-gradient-background' => 'gradient',
+		),
+	)
+);
