@@ -10,6 +10,8 @@ import { TransitionPresets } from '@react-navigation/stack';
  */
 import {
 	BottomSheet,
+	BottomSheetV2,
+	BottomSheetV2ScrollView,
 	BottomSheetConsumer,
 	PanelBody,
 } from '@wordpress/components';
@@ -21,6 +23,7 @@ import {
 	requestContactCustomerSupport,
 	requestGotoCustomerSupportOptions,
 } from '@wordpress/react-native-bridge';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -57,7 +60,7 @@ const HELP_TOPICS = [
 	},
 ];
 
-function EditorHelpTopics( { close, isVisible, onClose } ) {
+function EditorHelpTopics( { close, isVisible, onClose }, ref ) {
 	const { postType } = useSelect( ( select ) => ( {
 		postType: select( editorStore ).getEditedPostAttribute( 'type' ),
 	} ) );
@@ -68,13 +71,13 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 			: __( 'How to edit your post' );
 
 	return (
-		<BottomSheet
-			isVisible={ isVisible }
-			onClose={ onClose }
-			hideHeader
-			hasNavigation
-			contentStyle={ styles.contentContainer }
-			testID="editor-help-modal"
+		<BottomSheetV2
+			ref={ ref }
+			// onClose={ onClose }
+			// hideHeader
+			// hasNavigation
+			// contentStyle={ styles.contentContainer }
+			// testID="editor-help-modal"
 		>
 			<SafeAreaView>
 				<BottomSheet.NavigationContainer
@@ -97,92 +100,80 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 									{ title }
 								</BottomSheet.NavBar.Heading>
 							</BottomSheet.NavBar>
-							<BottomSheetConsumer>
+							{ /* <BottomSheetConsumer>
 								{ ( { listProps } ) => {
 									const contentContainerStyle =
 										StyleSheet.flatten(
 											listProps.contentContainerStyle
 										);
-									return (
-										<ScrollView
-											{ ...listProps }
-											contentContainerStyle={ {
-												...contentContainerStyle,
-												paddingBottom: Math.max(
-													listProps.safeAreaBottomInset,
-													contentContainerStyle.paddingBottom
-												),
-												/**
-												 * Remove margin set via `hideHeader`. Combining a header
-												 * and navigation in this bottom sheet is at odds with the
-												 * current `BottomSheet` implementation.
-												 */
-												marginTop: 0,
-											} }
-										>
-											<PanelBody>
-												<HelpSectionTitle>
-													{ __( 'The basics' ) }
-												</HelpSectionTitle>
-												{ /* Print out help topics. */ }
-												{ HELP_TOPICS.map(
-													(
-														{ label, icon },
-														index
-													) => {
-														const labelSlug =
-															kebabCase( label );
-														const isLastItem =
-															index ===
-															HELP_TOPICS.length -
-																1;
-														return (
-															<HelpTopicRow
-																key={
-																	labelSlug
-																}
-																label={ label }
-																icon={ icon }
-																screenName={
-																	labelSlug
-																}
-																isLastItem={
-																	isLastItem
-																}
-															/>
-														);
-													}
-												) }
-												{
-													<HelpSectionTitle>
-														{ __( 'Get support' ) }
-													</HelpSectionTitle>
-												}
-												{
-													<HelpGetSupportButton
-														title={ __(
-															'Contact support'
-														) }
-														onPress={
-															requestContactCustomerSupport
-														}
-													/>
-												}
-												{
-													<HelpGetSupportButton
-														title={ __(
-															'More support options'
-														) }
-														onPress={
-															requestGotoCustomerSupportOptions
-														}
-													/>
-												}
-											</PanelBody>
-										</ScrollView>
-									);
+									return ( */ }
+							<BottomSheetV2ScrollView
+							// { ...listProps }
+							// contentContainerStyle={ {
+							// 	...contentContainerStyle,
+							// 	paddingBottom: Math.max(
+							// 		listProps.safeAreaBottomInset,
+							// 		contentContainerStyle.paddingBottom
+							// 	),
+							// 	/**
+							// 	 * Remove margin set via `hideHeader`. Combining a header
+							// 	 * and navigation in this bottom sheet is at odds with the
+							// 	 * current `BottomSheet` implementation.
+							// 	 */
+							// 	marginTop: 0,
+							// } }
+							>
+								<PanelBody>
+									<HelpSectionTitle>
+										{ __( 'The basics' ) }
+									</HelpSectionTitle>
+									{ /* Print out help topics. */ }
+									{ HELP_TOPICS.map(
+										( { label, icon }, index ) => {
+											const labelSlug =
+												kebabCase( label );
+											const isLastItem =
+												index ===
+												HELP_TOPICS.length - 1;
+											return (
+												<HelpTopicRow
+													key={ labelSlug }
+													label={ label }
+													icon={ icon }
+													screenName={ labelSlug }
+													isLastItem={ isLastItem }
+												/>
+											);
+										}
+									) }
+									{
+										<HelpSectionTitle>
+											{ __( 'Get support' ) }
+										</HelpSectionTitle>
+									}
+									{
+										<HelpGetSupportButton
+											title={ __( 'Contact support' ) }
+											onPress={
+												requestContactCustomerSupport
+											}
+										/>
+									}
+									{
+										<HelpGetSupportButton
+											title={ __(
+												'More support options'
+											) }
+											onPress={
+												requestGotoCustomerSupportOptions
+											}
+										/>
+									}
+								</PanelBody>
+							</BottomSheetV2ScrollView>
+							{ /* );
 								} }
-							</BottomSheetConsumer>
+							</BottomSheetConsumer> */ }
 						</View>
 					</BottomSheet.NavigationScreen>
 					{ /* Print out help detail screens. */ }
@@ -203,8 +194,8 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 					} ) }
 				</BottomSheet.NavigationContainer>
 			</SafeAreaView>
-		</BottomSheet>
+		</BottomSheetV2>
 	);
 }
 
-export default EditorHelpTopics;
+export default forwardRef( EditorHelpTopics );

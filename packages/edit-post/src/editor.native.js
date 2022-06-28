@@ -4,6 +4,7 @@
 import memize from 'memize';
 import { map, without } from 'lodash';
 import { I18nManager } from 'react-native';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 /**
  * WordPress dependencies
@@ -175,15 +176,17 @@ class Editor extends Component {
 
 		return (
 			<SlotFillProvider>
-				<EditorProvider
-					settings={ editorSettings }
-					post={ normalizedPost }
-					initialEdits={ initialEdits }
-					useSubRegistry={ false }
-					{ ...props }
-				>
-					<Layout setTitleRef={ this.setTitleRef } />
-				</EditorProvider>
+				<BottomSheetModalProvider>
+					<EditorProvider
+						settings={ editorSettings }
+						post={ normalizedPost }
+						initialEdits={ initialEdits }
+						useSubRegistry={ false }
+						{ ...props }
+					>
+						<Layout setTitleRef={ this.setTitleRef } />
+					</EditorProvider>
+				</BottomSheetModalProvider>
 			</SlotFillProvider>
 		);
 	}

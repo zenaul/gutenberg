@@ -82,6 +82,10 @@ export {
 export { default as Autocomplete } from './autocomplete';
 export { default as BottomSheet } from './mobile/bottom-sheet';
 export {
+	default as BottomSheetV2,
+	BottomSheetV2ScrollView,
+} from './mobile/bottom-sheet-v2';
+export {
 	BottomSheetConsumer,
 	BottomSheetProvider,
 	BottomSheetContext,

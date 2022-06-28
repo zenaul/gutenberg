@@ -21,7 +21,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeShowNotice,
 	subscribeShowEditorHelp,
 } from '@wordpress/react-native-bridge';
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { count as wordCount } from '@wordpress/wordcount';
 import {
 	parse,
@@ -88,6 +88,7 @@ class NativeEditorProvider extends Component {
 		this.state = {
 			isHelpVisible: false,
 		};
+		this.helpRef = createRef();
 	}
 
 	componentDidMount() {
@@ -166,7 +167,8 @@ class NativeEditorProvider extends Component {
 		);
 
 		this.subscriptionParentShowEditorHelp = subscribeShowEditorHelp( () => {
-			this.setState( { isHelpVisible: true } );
+			// this.setState( { isHelpVisible: true } );
+			this.helpRef.current?.present();
 		} );
 
 		// Request current block impressions from native app.
@@ -332,9 +334,10 @@ class NativeEditorProvider extends Component {
 					<SafeAreaProvider>{ children }</SafeAreaProvider>
 				</EditorProvider>
 				<EditorHelpTopics
-					isVisible={ this.state.isHelpVisible }
-					onClose={ () => this.setState( { isHelpVisible: false } ) }
-					close={ () => this.setState( { isHelpVisible: false } ) }
+					ref={ this.helpRef }
+					// isVisible={ this.state.isHelpVisible }
+					// onClose={ () => this.setState( { isHelpVisible: false } ) }
+					// close={ () => this.setState( { isHelpVisible: false } ) }
 				/>
 			</>
 		);
