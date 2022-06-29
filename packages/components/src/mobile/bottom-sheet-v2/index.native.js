@@ -1,19 +1,38 @@
 /**
  * External dependencies
  */
-import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import {
+	BottomSheetModal,
+	BottomSheetBackdrop,
+	BottomSheetScrollView,
+} from '@gorhom/bottom-sheet';
 
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useCallback } from '@wordpress/element';
 
 function BottomSheetV2(
 	{ children, index = 0, snapPoints = [ '50%' ] } = {},
 	ref
 ) {
+	const renderBackdrop = useCallback(
+		( props ) => (
+			<BottomSheetBackdrop
+				{ ...props }
+				disappearsOnIndex={ -1 }
+				appearsOnIndex={ 0 }
+			/>
+		),
+		[]
+	);
 	return (
-		<BottomSheetModal index={ index } ref={ ref } snapPoints={ snapPoints }>
+		<BottomSheetModal
+			backdropComponent={ renderBackdrop }
+			index={ index }
+			ref={ ref }
+			snapPoints={ snapPoints }
+		>
 			{ children }
 		</BottomSheetModal>
 	);
