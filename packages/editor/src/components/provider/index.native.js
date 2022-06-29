@@ -333,12 +333,7 @@ class NativeEditorProvider extends Component {
 				>
 					<SafeAreaProvider>{ children }</SafeAreaProvider>
 				</EditorProvider>
-				<EditorHelpTopics
-					ref={ this.helpRef }
-					// isVisible={ this.state.isHelpVisible }
-					// onClose={ () => this.setState( { isHelpVisible: false } ) }
-					// close={ () => this.setState( { isHelpVisible: false } ) }
-				/>
+				<EditorHelpTopics ref={ this.helpRef } />
 			</>
 		);
 	}
