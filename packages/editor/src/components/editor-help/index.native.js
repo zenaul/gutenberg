@@ -8,12 +8,7 @@ import { TransitionPresets } from '@react-navigation/stack';
 /**
  * WordPress dependencies
  */
-import {
-	BottomSheet,
-	BottomSheetV2,
-	BottomSheetV2ScrollView,
-	PanelBody,
-} from '@wordpress/components';
+import { BottomSheet, BottomSheetV2, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { helpFilled, plusCircleFilled, trash, cog } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
@@ -99,7 +94,7 @@ function EditorHelpTopics( props, ref ) {
 								{ title }
 							</BottomSheet.NavBar.Heading>
 						</BottomSheet.NavBar>
-						<BottomSheetV2ScrollView>
+						<BottomSheetV2.ScrollView>
 							<PanelBody>
 								<HelpSectionTitle>
 									{ __( 'The basics' ) }
@@ -143,7 +138,7 @@ function EditorHelpTopics( props, ref ) {
 									/>
 								}
 							</PanelBody>
-						</BottomSheetV2ScrollView>
+						</BottomSheetV2.ScrollView>
 					</View>
 				</BottomSheet.NavigationScreen>
 				{ /* Print out help detail screens. */ }

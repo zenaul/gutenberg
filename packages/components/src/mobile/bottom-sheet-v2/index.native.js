@@ -26,6 +26,7 @@ function BottomSheetV2(
 		),
 		[]
 	);
+
 	return (
 		<BottomSheetModal
 			backdropComponent={ renderBackdrop }
@@ -38,6 +39,8 @@ function BottomSheetV2(
 	);
 }
 
-export const BottomSheetV2ScrollView = BottomSheetScrollView;
+const BottomSheetV2ForwardRef = forwardRef( BottomSheetV2 );
 
-export default forwardRef( BottomSheetV2 );
+BottomSheetV2ForwardRef.ScrollView = BottomSheetScrollView;
+
+export default BottomSheetV2ForwardRef;
