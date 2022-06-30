@@ -6,6 +6,7 @@ import {
 	BottomSheetBackdrop,
 	BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
+import { FullWindowOverlay } from 'react-native-screens';
 
 /**
  * WordPress dependencies
@@ -22,20 +23,23 @@ function BottomSheetV2(
 				{ ...props }
 				disappearsOnIndex={ -1 }
 				appearsOnIndex={ 0 }
+				opacity={ 0.8 }
 			/>
 		),
 		[]
 	);
 
 	return (
-		<BottomSheetModal
-			backdropComponent={ renderBackdrop }
-			index={ index }
-			ref={ ref }
-			snapPoints={ snapPoints }
-		>
-			{ children }
-		</BottomSheetModal>
+		<FullWindowOverlay>
+			<BottomSheetModal
+				backdropComponent={ renderBackdrop }
+				index={ index }
+				ref={ ref }
+				snapPoints={ snapPoints }
+			>
+				{ children }
+			</BottomSheetModal>
+		</FullWindowOverlay>
 	);
 }
 
