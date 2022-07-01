@@ -85,9 +85,6 @@ class NativeEditorProvider extends Component {
 				maxSize: 1,
 			}
 		);
-		this.state = {
-			isHelpVisible: false,
-		};
 		this.helpRef = createRef();
 	}
 
@@ -167,7 +164,6 @@ class NativeEditorProvider extends Component {
 		);
 
 		this.subscriptionParentShowEditorHelp = subscribeShowEditorHelp( () => {
-			// this.setState( { isHelpVisible: true } );
 			this.helpRef.current?.present();
 		} );
 
