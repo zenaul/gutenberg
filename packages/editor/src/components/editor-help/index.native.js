@@ -71,7 +71,7 @@ function EditorHelpTopics( props, ref ) {
 	return (
 		<BottomSheetV2
 			ref={ ref }
-			snapPoints={ [ '80%' ] }
+			snapPoints={ [ '100%' ] }
 			testID="editor-help-modal"
 		>
 			<BottomSheet.NavigationContainer
