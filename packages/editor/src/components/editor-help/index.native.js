@@ -17,7 +17,7 @@ import {
 	requestContactCustomerSupport,
 	requestGotoCustomerSupportOptions,
 } from '@wordpress/react-native-bridge';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -68,10 +68,12 @@ function EditorHelpTopics( props, ref ) {
 			? __( 'How to edit your page' )
 			: __( 'How to edit your post' );
 
+	const snapPoints = useMemo( () => [ '94%' ], [] );
+
 	return (
 		<BottomSheetV2
 			ref={ ref }
-			snapPoints={ [ '94%' ] }
+			snapPoints={ snapPoints }
 			testID="editor-help-modal"
 		>
 			<BottomSheet.NavigationContainer
