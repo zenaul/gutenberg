@@ -72,6 +72,7 @@ function EditorHelpTopics( props, ref ) {
 
 	return (
 		<BottomSheetV2
+			index={ -1 }
 			ref={ ref }
 			snapPoints={ snapPoints }
 			testID="editor-help-modal"

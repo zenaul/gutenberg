@@ -19,19 +19,26 @@ import {
 } from '@wordpress/element';
 
 function BottomSheetV2(
-	{ children, index = 0, snapPoints = [ '50%' ] } = {},
+	{ children, index = 0, onClose, snapPoints = [ '50%' ], style } = {},
 	ref
 ) {
-	const [ visible, setVisible ] = useState( false );
 	const bottomSheetRef = useRef( null );
+	const [ visible, setVisible ] = useState( index >= 0 );
+	/**
+	 * `internalIndex` is used to allow displaying the modal on initial render,
+	 * which is required in some areas of the code base that do not easily support
+	 * an call to an imperative `present` method.
+	 */
+	const [ internalIndex, setInternalIndex ] = useState( index );
 
 	const handlePresent = useCallback( () => {
 		setVisible( true );
-	} );
+		setInternalIndex( index >= 0 ? index : 0 );
+	}, [] );
 
 	const handleDismiss = useCallback( () => {
 		bottomSheetRef.current?.close();
-	} );
+	}, [] );
 
 	/**
 	 * Utilize imperative handle to mimic the `@gorhom/bottom-sheet` API, which
@@ -60,12 +67,16 @@ function BottomSheetV2(
 			<BottomSheet
 				backdropComponent={ renderBackdrop }
 				enablePanDownToClose={ true }
-				index={ index }
+				index={ internalIndex }
 				onClose={ () => {
 					setVisible( false );
+					if ( onClose ) {
+						onClose();
+					}
 				} }
 				ref={ bottomSheetRef }
 				snapPoints={ snapPoints }
+				style={ style }
 			>
 				{ children }
 			</BottomSheet>
