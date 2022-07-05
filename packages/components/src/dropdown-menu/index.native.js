@@ -124,7 +124,7 @@ function DropdownMenu( {
 					<BottomSheetV2
 						index={ isOpen ? 0 : -1 }
 						onClose={ onClose }
-						snapPoints={ [ '60%' ] }
+						snapPoints={ [ 'CONTENT_HEIGHT' ] }
 						style={ { paddingRight: 16, paddingLeft: 16 } }
 					>
 						{ isFunction( children ) ? children( props ) : null }

@@ -3,7 +3,9 @@
  */
 import BottomSheet, {
 	BottomSheetBackdrop,
+	BottomSheetView,
 	BottomSheetScrollView,
+	useBottomSheetDynamicSnapPoints,
 } from '@gorhom/bottom-sheet';
 import { Modal } from 'react-native';
 
@@ -19,7 +21,7 @@ import {
 } from '@wordpress/element';
 
 function BottomSheetV2(
-	{ children, index = 0, onClose, snapPoints = [ '50%' ], style } = {},
+	{ onClose, children, index = 0, snapPoints = [ '50%' ], style } = {},
 	ref
 ) {
 	const bottomSheetRef = useRef( null );
@@ -62,11 +64,20 @@ function BottomSheetV2(
 		[]
 	);
 
+	const {
+		animatedHandleHeight,
+		animatedSnapPoints,
+		animatedContentHeight,
+		handleContentLayout,
+	} = useBottomSheetDynamicSnapPoints( snapPoints );
+
 	return (
 		<Modal transparent={ true } visible={ visible }>
 			<BottomSheet
 				backdropComponent={ renderBackdrop }
 				enablePanDownToClose={ true }
+				contentHeight={ animatedContentHeight }
+				handleHeight={ animatedHandleHeight }
 				index={ internalIndex }
 				onClose={ () => {
 					setVisible( false );
@@ -75,10 +86,12 @@ function BottomSheetV2(
 					}
 				} }
 				ref={ bottomSheetRef }
-				snapPoints={ snapPoints }
+				snapPoints={ animatedSnapPoints }
 				style={ style }
 			>
-				{ children }
+				<BottomSheetScrollView onLayout={ handleContentLayout }>
+					{ children }
+				</BottomSheetScrollView>
 			</BottomSheet>
 		</Modal>
 	);
@@ -87,5 +100,6 @@ function BottomSheetV2(
 const BottomSheetV2ForwardRef = forwardRef( BottomSheetV2 );
 
 BottomSheetV2ForwardRef.ScrollView = BottomSheetScrollView;
+BottomSheetV2ForwardRef.View = BottomSheetView;
 
 export default BottomSheetV2ForwardRef;
