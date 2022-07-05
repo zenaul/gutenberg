@@ -15,6 +15,9 @@
  * @return string The content of the block being rendered.
  */
 function block_core_heading_render( $attributes, $content ) {
+	if ( ! $content ) {
+		return $content;
+	}
 	$matches = array();
 	$pattern = '/
         ^(\s*)                               # Any leading whitespace.
