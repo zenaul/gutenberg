@@ -40,11 +40,26 @@ function block_core_heading_render( $attributes, $content ) {
 		$content,
 		$matches
 	);
+
 	if ( empty( $matches ) ) {
 		return $content;
 	}
 
-	$new_class_name = trim( $matches['class_name'] . ' wp-block-heading' );
+	// Parse the existing class names.
+	$current_class_name  = ! empty( $matches['class_name'] ) ? $matches['class_name'] : '';
+	$current_class_names = explode( ' ', $current_class_name );
+	$current_class_names = array_map( 'trim', $current_class_names );
+	$current_class_names = array_filter( $current_class_names );
+
+	// If wp-block-heading is already included, there's no need to add it again.
+	if ( in_array( 'wp-block-heading', $current_class_names, true ) ) {
+		return $content;
+	}
+
+	// Otherwise, let's add it to the class names.
+	$current_class_names[] = 'wp-block-heading';
+	$new_class_name        = implode( ' ', $current_class_names );
+
 	// Construct a new opening tag.
 	$new_tag_parts = array(
 		$matches['tag_name'],
@@ -66,8 +81,7 @@ function block_core_heading_render( $attributes, $content ) {
 function register_block_core_heading() {
 	register_block_type_from_metadata(
 		__DIR__ . '/heading',
-		array(
-			'render_callback' => 'block_core_heading_render',
+		array(//			'render_callback' => 'block_core_heading_render',
 		)
 	);
 }
