@@ -68,7 +68,7 @@ function EditorHelpTopics( props, ref ) {
 			? __( 'How to edit your page' )
 			: __( 'How to edit your post' );
 
-	const snapPoints = useMemo( () => [ '94%' ], [] );
+	const snapPoints = useMemo( () => [ 'CONTENT_HEIGHT' ], [] );
 
 	return (
 		<BottomSheetV2
@@ -83,8 +83,8 @@ function EditorHelpTopics( props, ref ) {
 				style={ styles.navigationContainer }
 			>
 				<BottomSheet.NavigationScreen
-					isScrollable
-					fullScreen
+					// isScrollable
+					// fullScreen
 					name="help-topics"
 				>
 					<View style={ styles.container }>
