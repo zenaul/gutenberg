@@ -1,13 +1,13 @@
 <?php
 /**
- * Navigation block rendering tests.
+ * Heading block rendering tests.
  *
  * @package WordPress
  * @subpackage Blocks
  */
 
 /**
- * Tests for the Navigation block.
+ * Tests for the Heading block.
  *
  * @group blocks
  */
