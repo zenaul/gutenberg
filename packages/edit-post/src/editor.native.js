@@ -3,8 +3,7 @@
  */
 import memize from 'memize';
 import { map, without } from 'lodash';
-import { I18nManager, StyleSheet } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { I18nManager } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -175,28 +174,20 @@ class Editor extends Component {
 		};
 
 		return (
-			<GestureHandlerRootView style={ styles.container }>
-				<SlotFillProvider>
-					<EditorProvider
-						settings={ editorSettings }
-						post={ normalizedPost }
-						initialEdits={ initialEdits }
-						useSubRegistry={ false }
-						{ ...props }
-					>
-						<Layout setTitleRef={ this.setTitleRef } />
-					</EditorProvider>
-				</SlotFillProvider>
-			</GestureHandlerRootView>
+			<SlotFillProvider>
+				<EditorProvider
+					settings={ editorSettings }
+					post={ normalizedPost }
+					initialEdits={ initialEdits }
+					useSubRegistry={ false }
+					{ ...props }
+				>
+					<Layout setTitleRef={ this.setTitleRef } />
+				</EditorProvider>
+			</SlotFillProvider>
 		);
 	}
 }
-
-const styles = StyleSheet.create( {
-	container: {
-		flex: 1,
-	},
-} );
 
 export default compose( [
 	withSelect( ( select ) => {
