@@ -214,7 +214,7 @@ describe( 'Blocks raw handling', () => {
 			.join( '' );
 
 		expect( filtered ).toBe(
-			'<h1>Some <em>heading</em></h1><p>A paragraph.</p>'
+			'<h1 class="wp-block-heading">Some <em>heading</em></h1><p>A paragraph.</p>'
 		);
 		expect( console ).toHaveLogged();
 	} );
@@ -419,7 +419,7 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	describe.only( 'pasteHandler', () => {
+	describe( 'pasteHandler', () => {
 		[
 			'plain',
 			'classic',
