@@ -11,13 +11,13 @@ import { DOWN } from '@wordpress/keycodes';
 import { BottomSheet, BottomSheetV2, PanelBody } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { menu } from '@wordpress/icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 /**
  * Internal dependencies
  */
 import Button from '../button';
 import Dropdown from '../dropdown';
-import styles from './style';
 
 function mergeProps( defaultProps = {}, props = {} ) {
 	const mergedProps = {
@@ -54,6 +54,8 @@ function DropdownMenu( {
 	popoverProps,
 	toggleProps,
 } ) {
+	const { bottom: bottomInset } = useSafeAreaInsets();
+
 	if ( isEmpty( controls ) && ! isFunction( children ) ) {
 		return null;
 	}
@@ -126,12 +128,11 @@ function DropdownMenu( {
 						index={ isOpen ? 0 : -1 }
 						onClose={ onClose }
 						snapPoints={ [ BottomSheetV2.CONTENT_HEIGHT ] }
-						style={ styles[ 'dropdown-menu__bottom-sheet' ] }
 					>
 						{ isFunction( children ) ? children( props ) : null }
 						<PanelBody
 							title={ label }
-							style={ { paddingLeft: 0, paddingRight: 0 } }
+							style={ { marginBottom: bottomInset + 20 } }
 						>
 							{ flatMap(
 								controlSets,
