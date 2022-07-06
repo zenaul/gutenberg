@@ -419,7 +419,7 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	describe( 'pasteHandler', () => {
+	describe.only( 'pasteHandler', () => {
 		[
 			'plain',
 			'classic',
