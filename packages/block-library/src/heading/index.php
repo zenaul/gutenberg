@@ -9,7 +9,7 @@
  * Adds a wp-block-heading class to the heading blocks without storing
  * it in the serialized $content.
  *
- * @param array $attributes Attributes of the block being rendered.
+ * @param array  $attributes Attributes of the block being rendered.
  * @param string $content Content of the block being rendered.
  *
  * @return string The content of the block being rendered.
