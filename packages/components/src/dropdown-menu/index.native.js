@@ -17,6 +17,7 @@ import { menu } from '@wordpress/icons';
  */
 import Button from '../button';
 import Dropdown from '../dropdown';
+import styles from './style';
 
 function mergeProps( defaultProps = {}, props = {} ) {
 	const mergedProps = {
@@ -125,10 +126,7 @@ function DropdownMenu( {
 						index={ isOpen ? 0 : -1 }
 						onClose={ onClose }
 						snapPoints={ [ BottomSheetV2.CONTENT_HEIGHT ] }
-						style={ {
-							paddingLeft: 16,
-							paddingRight: 16,
-						} }
+						style={ styles[ 'dropdown-menu__bottom-sheet' ] }
 					>
 						{ isFunction( children ) ? children( props ) : null }
 						<PanelBody
