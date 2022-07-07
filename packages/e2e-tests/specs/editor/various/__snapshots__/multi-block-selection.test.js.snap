@@ -46,10 +46,6 @@ exports[`Multi-block selection should copy and paste 3`] = `
 
 exports[`Multi-block selection should copy multiple blocks 1`] = `
 "<!-- wp:paragraph -->
-<p>1</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
 <p>2</p>
 <!-- /wp:paragraph -->
 
@@ -84,13 +80,13 @@ exports[`Multi-block selection should forward delete across blocks 1`] = `
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
-<h2 class=\"wp-block-heading\">]2</h2>
+<h2>]2</h2>
 <!-- /wp:heading -->"
 `;
 
 exports[`Multi-block selection should forward delete across blocks 2`] = `
 "<!-- wp:heading -->
-<h2 class=\"wp-block-heading\">1&amp;2</h2>
+<h2>1&amp;2</h2>
 <!-- /wp:heading -->"
 `;
 
@@ -128,7 +124,7 @@ exports[`Multi-block selection should handle Enter across blocks 1`] = `
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
-<h2 class=\"wp-block-heading\">]2</h2>
+<h2>]2</h2>
 <!-- /wp:heading -->"
 `;
 
@@ -142,7 +138,7 @@ exports[`Multi-block selection should handle Enter across blocks 2`] = `
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
-<h2 class=\"wp-block-heading\">2</h2>
+<h2>2</h2>
 <!-- /wp:heading -->"
 `;
 
@@ -184,7 +180,7 @@ exports[`Multi-block selection should not multi select single block 1`] = `
 
 exports[`Multi-block selection should only trigger multi-selection when at the end 1`] = `
 "<!-- wp:paragraph -->
-<p>1.</p>
+<p>4.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
