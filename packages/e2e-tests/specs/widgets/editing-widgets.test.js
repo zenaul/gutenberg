@@ -373,7 +373,7 @@ describe( 'Widgets screen', () => {
 		<p>First Paragraph</p>
 		</div></div>
 		<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
-		<h2 class=\\"wp-block-heading\\" id=\\"my-heading\\">My Heading</h2>
+		<h2 id=\\"my-heading\\">My Heading</h2>
 		</div></div>
 		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>Second Paragraph</p>
@@ -826,12 +826,12 @@ describe( 'Widgets screen', () => {
 		const serializedWidgetAreas = await getSerializedWidgetAreas();
 		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
 		Object {
-		  "sidebar-1": "<section id=\\"block-2\\" class=\\"widget widget_block widget_text\\">
+		  "sidebar-1": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>First Paragraph</p>
-		</section>
-		<section id=\\"block-3\\" class=\\"widget widget_block widget_text\\">
+		</div></div>
+		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>Second Paragraph</p>
-		</section>",
+		</div></div>",
 		}
 	` );
 	} );
