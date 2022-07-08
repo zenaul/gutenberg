@@ -44,6 +44,14 @@ class Render_Block_Heading_Test extends WP_UnitTestCase {
 				'<h2 class="is-align-right">Hello World</h2>',
 				'<h2 class="is-align-right wp-block-heading">Hello World</h2>',
 			),
+			'should handle single quotes'                => array(
+				"<h2 class='is-align-right'>Hello World</h2>",
+				"<h2 class='is-align-right wp-block-heading'>Hello World</h2>",
+			),
+			'should handle single quotes with double quotes inside' => array(
+				"<h2 class='\" is-align-right'>Hello World</h2>",
+				"<h2 class='\" is-align-right wp-block-heading'>Hello World</h2>",
+			),
 			'should not add a class name even when it is already defined' => array(
 				'<h2 class="is-align-right wp-block-heading">Hello World</h2>',
 				'<h2 class="is-align-right wp-block-heading">Hello World</h2>',

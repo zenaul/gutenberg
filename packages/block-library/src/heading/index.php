@@ -28,12 +28,16 @@ function block_core_heading_render( $attributes, $content ) {
         )
         (?<before_class>                     # Any attributes prior to "class"
             (?:                              # ?: is a "non-capturing group"
-                (?!\sclass=")[^>]            # Match all characters until ">" except when
+                (?!\sclass=["\'])[^>]        # Match all characters until ">" except when
                                              # the next character sequence is \sclass="
                                              # ?! is a "negative lookahead"
             )*
         )
-        (?:\s*class="(?<class_name>[^"]+)")? # The class attribute, if any
+	    (?:\s*                               # The class attribute, if any
+	        class=(?P<quote>[\'"])           # The quote character
+	        (?<class_name>.*?)               # Non-greedy match of any character
+	        (\k{quote})                      # Until we find that quote character again
+	    )?
         (?<after_class>[^>]*?)               # The rest of the tag
         >                                    # The closing tag
     /xm';
@@ -58,6 +62,7 @@ function block_core_heading_render( $attributes, $content ) {
 	if ( in_array( 'wp-block-heading', $current_class_names, true ) ) {
 		return $content;
 	}
+	$quote = ! empty( $matches['quote'] ) ? $matches['quote'] : '"';
 
 	// Otherwise, let's add it to the class names.
 	$current_class_names[] = 'wp-block-heading';
@@ -67,7 +72,7 @@ function block_core_heading_render( $attributes, $content ) {
 	$new_tag_parts = array(
 		$matches['tag_name'],
 		$matches['before_class'],
-		'class="' . $new_class_name . '"',
+		'class=' . $quote . $new_class_name . $quote,
 		$matches['after_class'],
 	);
 	$new_tag_parts = array_map( 'trim', $new_tag_parts );
