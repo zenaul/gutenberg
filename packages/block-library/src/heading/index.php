@@ -9,7 +9,7 @@
  * Adds a wp-block-heading class to the heading blocks without storing
  * it in the serialized $content.
  *
- * @param array  $attributes Attributes of the block being rendered.
+ * @param array $attributes Attributes of the block being rendered.
  * @param string $content Content of the block being rendered.
  *
  * @return string The content of the block being rendered.
@@ -18,7 +18,6 @@ function block_core_heading_render( $attributes, $content ) {
 	if ( ! $content ) {
 		return $content;
 	}
-	$matches = array();
 	$pattern = '/
         ^(\s*)                               # Any leading whitespace.
         <(?<tag_name>
@@ -42,45 +41,26 @@ function block_core_heading_render( $attributes, $content ) {
         >                                    # The closing tag
     /xm';
 
-	preg_match(
+	return preg_replace_callback(
 		$pattern,
-		$content,
-		$matches
+		function ( $matches ) {
+			// Parse the existing class names.
+			$current_class_attr = ! empty( $matches['class_name'] ) ? $matches['class_name'] : '';
+
+			// If wp-block-heading is already included, there's no need to add it again.
+			$class_to_add = 'wp-block-heading';
+			if ( preg_match( "/\b$class_to_add\b/", $current_class_attr ) ) {
+				return $matches[0];
+			}
+
+			// Otherwise, let's replace the existing opening tag with a new one.
+			$new_class_attr = trim( "$current_class_attr $class_to_add" );
+			$quote          = ! empty( $matches['quote'] ) ? $matches['quote'] : '"';
+
+			return "<{$matches['tag_name']}{$matches['before_class']} class={$quote}{$new_class_attr}{$quote}{$matches['after_class']}>";
+		},
+		$content
 	);
-
-	if ( empty( $matches ) ) {
-		return $content;
-	}
-
-	// Parse the existing class names.
-	$current_class_name  = ! empty( $matches['class_name'] ) ? $matches['class_name'] : '';
-	$current_class_names = explode( ' ', $current_class_name );
-	$current_class_names = array_map( 'trim', $current_class_names );
-	$current_class_names = array_filter( $current_class_names );
-
-	// If wp-block-heading is already included, there's no need to add it again.
-	if ( in_array( 'wp-block-heading', $current_class_names, true ) ) {
-		return $content;
-	}
-	$quote = ! empty( $matches['quote'] ) ? $matches['quote'] : '"';
-
-	// Otherwise, let's add it to the class names.
-	$current_class_names[] = 'wp-block-heading';
-	$new_class_name        = implode( ' ', $current_class_names );
-
-	// Construct a new opening tag.
-	$new_tag_parts = array(
-		$matches['tag_name'],
-		$matches['before_class'],
-		'class=' . $quote . $new_class_name . $quote,
-		$matches['after_class'],
-	);
-	$new_tag_parts = array_map( 'trim', $new_tag_parts );
-	$new_tag_parts = array_filter( $new_tag_parts );
-	$new_tag       = '<' . implode( ' ', $new_tag_parts ) . '>';
-
-	// Replace the old opening tag with the new one.
-	return $new_tag . substr( $content, strlen( $matches[0] ) );
 }
 
 /**

@@ -62,7 +62,7 @@ class Render_Block_Heading_Test extends WP_UnitTestCase {
 			),
 			'should add a class name even when the class attribute is already defined and has many entries' => array(
 				'<h2 class="is-align-right custom   classes">Hello World</h2>',
-				'<h2 class="is-align-right custom classes wp-block-heading">Hello World</h2>',
+				'<h2 class="is-align-right custom   classes wp-block-heading">Hello World</h2>',
 			),
 			'should not add a class name to a nested h2' => array(
 				'<h2 class="is-align-right custom classes"><h2>Hello World</h2></h2>',
