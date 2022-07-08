@@ -32,18 +32,14 @@ function block_core_heading_render( $attributes, $content ) {
                                              # ?= means a "lookahead"
         )
         (?<before_class>                     # Any attributes prior to "class"
-            (?:                              # ?: is a "non-capturing group"
-                (?!\sclass=["\'])[^>]        # Match all characters until ">" except when
-                                             # the next character sequence is \sclass="
-                                             # ?! is a "negative lookahead"
-            )*
+            [^>]*?				             # Non-greedy match of any character except ">"
         )
-	    (?:\s*                               # The class attribute, if any
+	    (?:\s+                               # Until we find the class attribute, if any
 	        class=(?P<quote>[\'"])           # The quote character
 	        (?<class_name>.*?)               # Non-greedy match of any character
 	        (\k{quote})                      # Until we find that quote character again
+            (?<after_class>[^>]*?)           # The rest of the tag
 	    )?
-        (?<after_class>[^>]*?)               # The rest of the tag
         >                                    # The closing tag
     /xm';
 
