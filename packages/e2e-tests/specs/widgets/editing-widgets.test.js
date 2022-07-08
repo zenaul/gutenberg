@@ -826,12 +826,12 @@ describe( 'Widgets screen', () => {
 		const serializedWidgetAreas = await getSerializedWidgetAreas();
 		expect( serializedWidgetAreas ).toMatchInlineSnapshot( `
 		Object {
-		  "sidebar-1": "<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
+		  "sidebar-1": "<section id=\\"block-2\\" class=\\"widget widget_block widget_text\\">
 		<p>First Paragraph</p>
-		</div></div>
-		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
+		</section>
+		<section id=\\"block-3\\" class=\\"widget widget_block widget_text\\">
 		<p>Second Paragraph</p>
-		</div></div>",
+		</section>",
 		}
 	` );
 	} );
