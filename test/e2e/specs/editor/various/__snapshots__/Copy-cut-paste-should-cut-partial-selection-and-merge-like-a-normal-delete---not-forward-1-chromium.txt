@@ -5,4 +5,3 @@
 <!-- wp:paragraph -->
 <p>Paragraph</p>
 <!-- /wp:paragraph -->
-
