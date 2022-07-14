@@ -49,6 +49,10 @@ body.site-editor-php {
 		top: 0;
 	}
 
+	.no-js & {
+		min-height: 0;
+	}
+
 	.interface-interface-skeleton {
 		top: 0;
 	}
