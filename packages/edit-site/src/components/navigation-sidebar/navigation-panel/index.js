@@ -89,8 +89,8 @@ const NavigationPanel = ( { activeItem = SITE_EDITOR_KEY } ) => {
 							/>
 						</MainDashboardButton.Slot>
 
-						<NavigationMenu>
-							<NavigationGroup title={ __( 'Editor' ) }>
+						<NavigationMenu title={ __( 'Editor' ) }>
+							<NavigationGroup>
 								<NavLink
 									icon={ siteIcon }
 									title={ __( 'Site' ) }
