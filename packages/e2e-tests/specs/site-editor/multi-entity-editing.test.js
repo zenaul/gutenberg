@@ -216,7 +216,7 @@ describe( 'Multi-entity editor states', () => {
 				templateName
 			);
 			await page.waitForXPath(
-				`//h1[contains(@class, "edit-site-document-actions__title") and contains(text(), '${ templateName }')]`
+				`//h2[contains(@class, "edit-site-document-actions__title") and contains(text(), '${ templateName }')]`
 			);
 
 			removeErrorMocks();
