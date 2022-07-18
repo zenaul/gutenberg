@@ -58,6 +58,7 @@ export default function ListItemEdit( {
 	attributes,
 	setAttributes,
 	onReplace,
+	onRemove,
 	clientId,
 } ) {
 	const { placeholder, content } = attributes;
@@ -87,6 +88,7 @@ export default function ListItemEdit( {
 					onReplace={ ( blocks, ...args ) => {
 						onReplace( convertToListItems( blocks ), ...args );
 					} }
+					onRemove={ onRemove }
 				/>
 				{ innerBlocksProps.children }
 			</li>
