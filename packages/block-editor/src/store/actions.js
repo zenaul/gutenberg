@@ -1171,11 +1171,10 @@ export const removeBlocks =
 			);
 		}
 
-		dispatch( { type: 'REMOVE_BLOCKS', clientIds } );
-
-		if ( removeEmpty ) {
-			dispatch( { type: 'REMOVE_BLOCKS', clientIds: [ rootClientId ] } );
-		}
+		dispatch( {
+			type: 'REMOVE_BLOCKS',
+			clientIds: removeEmpty ? [ rootClientId ] : clientIds,
+		} );
 
 		// To avoid a focus loss when removing the last block, assure there
 		// is always a default block if the last of the blocks have been
