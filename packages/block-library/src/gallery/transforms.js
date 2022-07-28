@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, every } from 'lodash';
+import { filter, every, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -144,7 +144,9 @@ const transforms = {
 
 				if ( isGalleryV2Enabled() ) {
 					const innerBlocks = validImages.map( ( image ) => {
-						return createBlock( 'core/image', image );
+						return createBlock( 'core/image', {
+							...omit( image, 'width', 'height' ),
+						} );
 					} );
 
 					return createBlock(
