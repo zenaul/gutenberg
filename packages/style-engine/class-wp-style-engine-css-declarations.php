@@ -127,11 +127,12 @@ class WP_Style_Engine_CSS_Declarations {
 		$indent              = $should_prettify ? str_repeat( "\t", $indent_count ) : '';
 		$suffix              = $should_prettify ? ' ' : '';
 		$suffix              = $should_prettify && $indent_count > 0 ? "\n" : $suffix;
+		$spacer              = $should_prettify ? ' ' : '';
 
 		foreach ( $declarations_array as $property => $value ) {
 			// Account for CSS variables.
 			if ( 0 === strpos( $property, '--' ) || ( 'display' === $property && 'none' !== $value ) ) {
-				$declarations_output .= "{$property}:{$spacer}{$value}";";
+				$declarations_output .= "{$property}:{$spacer}{$value}";
 				continue;
 			}
 			$filtered_declaration = safecss_filter_attr( "{$property}:{$spacer}{$value}" );
