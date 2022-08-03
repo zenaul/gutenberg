@@ -105,3 +105,23 @@ export const getFrameOffset = ( document ) => {
 	const iframeRect = frameElement.getBoundingClientRect();
 	return { x: iframeRect.left, y: iframeRect.top };
 };
+
+/**
+ * Checks the placement for a top/bottom value.
+ *
+ * @param {FloatingUIPlacement} placement
+ * @return {boolean} Whether the placement is top or bottom
+ */
+export const isTopBottomPlacement = ( placement ) =>
+	placement.trim().startsWith( 'top' ) ||
+	placement.trim().startsWith( 'bottom' );
+
+/**
+ * Checks the placement for a top/left value.
+ *
+ * @param {FloatingUIPlacement} placement
+ * @return {boolean} Whether the placement is top or left
+ */
+export const hasBeforePlacement = ( placement ) =>
+	placement.trim().startsWith( 'top' ) ||
+	placement.trim().startsWith( 'left' );
