@@ -101,7 +101,7 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 		$css_declarations   = new WP_Style_Engine_CSS_Declarations( $input_declarations );
 
 		$this->assertSame(
-			'color: red; border-top-left-radius: 99px; text-decoration: underline; ',
+			'color: red; border-top-left-radius: 99px; text-decoration: underline;',
 			$css_declarations->get_declarations_string( true )
 		);
 	}
