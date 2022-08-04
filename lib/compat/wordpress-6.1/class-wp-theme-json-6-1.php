@@ -647,7 +647,11 @@ class WP_Theme_JSON_6_1 extends WP_Theme_JSON_6_0 {
 		$processor = new WP_Style_Engine_Processor_Gutenberg();
 		$processor->add_css_string( $stylesheet );
 
-		return $processor->get_css();
+		return $processor->get_css(
+			array(
+				'prettify' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
+			)
+		);
 	}
 
 	/**
