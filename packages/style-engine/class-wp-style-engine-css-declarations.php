@@ -137,7 +137,7 @@ class WP_Style_Engine_CSS_Declarations {
 				0 === strpos( $value, 'max(' ) || // Account for max() values.
 				0 === strpos( $value, 'clamp(' ) // Account for clamp() values.
 			) {
-				$declarations_output .= "{$property}:{$spacer}{$value};$suffix";
+				$declarations_output .= "{$indent}{$property}:{$spacer}{$value};$suffix";
 				continue;
 			}
 			$filtered_declaration = safecss_filter_attr( "{$property}:{$spacer}{$value};" );
