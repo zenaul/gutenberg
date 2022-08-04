@@ -130,12 +130,17 @@ class WP_Style_Engine_CSS_Declarations {
 		$spacer              = $should_prettify ? ' ' : '';
 
 		foreach ( $declarations_array as $property => $value ) {
-			// Account for CSS variables.
-			if ( 0 === strpos( $property, '--' ) || ( 'display' === $property && 'none' !== $value ) ) {
-				$declarations_output .= "{$property}:{$spacer}{$value}";
+			if (
+				0 === strpos( $property, '--' ) || // Account for CSS variables.
+				( 'display' === $property && 'none' !== $value ) || // Account for "display" when the value is not "none".
+				0 === strpos( $value, 'min(' ) || // Account for min() values.
+				0 === strpos( $value, 'max(' ) || // Account for max() values.
+				0 === strpos( $value, 'clamp(' ) // Account for clamp() values.
+			) {
+				$declarations_output .= "{$property}:{$spacer}{$value};$suffix";
 				continue;
 			}
-			$filtered_declaration = safecss_filter_attr( "{$property}:{$spacer}{$value}" );
+			$filtered_declaration = safecss_filter_attr( "{$property}:{$spacer}{$value};" );
 			if ( $filtered_declaration ) {
 				$declarations_output .= "{$indent}{$filtered_declaration};$suffix";
 			}
