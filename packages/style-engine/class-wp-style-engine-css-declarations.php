@@ -140,9 +140,9 @@ class WP_Style_Engine_CSS_Declarations {
 				$declarations_output .= "{$indent}{$property}:{$spacer}{$value};$suffix";
 				continue;
 			}
-			$filtered_declaration = safecss_filter_attr( "{$property}:{$spacer}{$value};" );
+			$filtered_declaration = safecss_filter_attr( "{$property}:{$spacer}{$value}" );
 			if ( $filtered_declaration ) {
-				$declarations_output .= "{$indent}{$filtered_declaration}$suffix";
+				$declarations_output .= "{$indent}{$filtered_declaration};$suffix";
 			}
 		}
 
