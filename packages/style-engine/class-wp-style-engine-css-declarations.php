@@ -142,16 +142,11 @@ class WP_Style_Engine_CSS_Declarations {
 			}
 			$filtered_declaration = safecss_filter_attr( "{$property}:{$spacer}{$value};" );
 			if ( $filtered_declaration ) {
-				$declarations_output .= "{$indent}{$filtered_declaration};$suffix";
+				$declarations_output .= "{$indent}{$filtered_declaration}$suffix";
 			}
 		}
 
-		// Trim if there's no indentation.
-		if ( $should_prettify && 0 === $indent_count ) {
-			$declarations_output = trim( $declarations_output );
-		}
-
-		return $declarations_output;
+		return rtrim( $declarations_output );
 	}
 
 	/**
