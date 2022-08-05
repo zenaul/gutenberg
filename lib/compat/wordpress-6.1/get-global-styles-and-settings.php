@@ -116,5 +116,13 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		// This cache doesn't need to be any longer, we only want to avoid spikes on high-traffic sites.
 		set_transient( $transient_name, $stylesheet, MINUTE_IN_SECONDS );
 	}
-	return $stylesheet;
+
+	$processor = new WP_Style_Engine_Processor_Gutenberg();
+	$processor->add_css_string( $stylesheet );
+
+	return $processor->get_css(
+		array(
+			'prettify' => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
+		)
+	);
 }
