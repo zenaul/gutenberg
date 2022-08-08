@@ -17,7 +17,8 @@ import {
 	InspectorControls,
 	BlockControls,
 	useBlockProps,
-	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
+	__experimentalRecursionProvider as RecursionProvider,
+	__experimentalUseHasRecursion as useHasRecursion,
 	store as blockEditorStore,
 	withColors,
 	PanelColorSettings,
@@ -62,33 +63,7 @@ import useConvertClassicToBlockMenu, {
 } from './use-convert-classic-menu-to-block-menu';
 import useCreateNavigationMenu from './use-create-navigation-menu';
 import { useInnerBlocks } from './use-inner-blocks';
-
-function getComputedStyle( node ) {
-	return node.ownerDocument.defaultView.getComputedStyle( node );
-}
-
-function detectColors( colorsDetectionElement, setColor, setBackground ) {
-	if ( ! colorsDetectionElement ) {
-		return;
-	}
-	setColor( getComputedStyle( colorsDetectionElement ).color );
-
-	let backgroundColorNode = colorsDetectionElement;
-	let backgroundColor =
-		getComputedStyle( backgroundColorNode ).backgroundColor;
-	while (
-		backgroundColor === 'rgba(0, 0, 0, 0)' &&
-		backgroundColorNode.parentNode &&
-		backgroundColorNode.parentNode.nodeType ===
-			backgroundColorNode.parentNode.ELEMENT_NODE
-	) {
-		backgroundColorNode = backgroundColorNode.parentNode;
-		backgroundColor =
-			getComputedStyle( backgroundColorNode ).backgroundColor;
-	}
-
-	setBackground( backgroundColor );
-}
+import { detectColors } from './utils';
 
 function Navigation( {
 	attributes,
@@ -130,9 +105,8 @@ function Navigation( {
 		setAttributes( { ref: postId } );
 	};
 
-	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
-		`navigationMenu/${ ref }`
-	);
+	const recursionId = `navigationMenu/${ ref }`;
+	const hasAlreadyRendered = useHasRecursion( recursionId );
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
@@ -233,6 +207,9 @@ function Navigation( {
 		hasResolvedCanUserCreateNavigationMenu,
 	} = useNavigationMenu( ref );
 
+	const navMenuResolvedButMissing =
+		hasResolvedNavigationMenus && isNavigationMenuMissing;
+
 	// Attempt to retrieve and prioritize any existing navigation menu unless
 	// a specific ref is allocated or the user is explicitly creating a new menu. The aim is
 	// for the block to "just work" from a user perspective using existing data.
@@ -329,27 +306,6 @@ function Navigation( {
 		{ __unstableIsDisabled: hasBlockOverlay }
 	);
 
-	const overlayClassnames = classnames( {
-		'has-text-color':
-			!! overlayTextColor.color || !! overlayTextColor?.class,
-		[ getColorClassName( 'color', overlayTextColor?.slug ) ]:
-			!! overlayTextColor?.slug,
-		'has-background':
-			!! overlayBackgroundColor.color || overlayBackgroundColor?.class,
-		[ getColorClassName(
-			'background-color',
-			overlayBackgroundColor?.slug
-		) ]: !! overlayBackgroundColor?.slug,
-	} );
-
-	const overlayStyles = {
-		color: ! overlayTextColor?.slug && overlayTextColor?.color,
-		backgroundColor:
-			! overlayBackgroundColor?.slug &&
-			overlayBackgroundColor?.color &&
-			overlayBackgroundColor.color,
-	};
-
 	// Turn on contrast checker for web only since it's not supported on mobile yet.
 	const enableContrastChecking = Platform.OS === 'web';
 
@@ -433,6 +389,7 @@ function Navigation( {
 		if ( isSelected || isInnerBlockSelected ) {
 			if (
 				ref &&
+				! navMenuResolvedButMissing &&
 				hasResolvedCanUserUpdateNavigationMenu &&
 				! canUserUpdateNavigationMenu
 			) {
@@ -670,8 +627,8 @@ function Navigation( {
 					isOpen={ isResponsiveMenuOpen }
 					isResponsive={ 'never' !== overlayMenu }
 					isHiddenByDefault={ 'always' === overlayMenu }
-					classNames={ overlayClassnames }
-					styles={ overlayStyles }
+					overlayBackgroundColor={ overlayBackgroundColor }
+					overlayTextColor={ overlayTextColor }
 				>
 					<UnsavedInnerBlocks
 						blockProps={ blockProps }
@@ -749,7 +706,7 @@ function Navigation( {
 
 	return (
 		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
-			<RecursionProvider>
+			<RecursionProvider uniqueId={ recursionId }>
 				<BlockControls>
 					{ ! isDraftNavigationMenu && isEntityAvailable && (
 						<ToolbarGroup className="wp-block-navigation__toolbar-menu-selector">
@@ -809,8 +766,8 @@ function Navigation( {
 							isOpen={ isResponsiveMenuOpen }
 							isResponsive={ isResponsive }
 							isHiddenByDefault={ 'always' === overlayMenu }
-							classNames={ overlayClassnames }
-							styles={ overlayStyles }
+							overlayBackgroundColor={ overlayBackgroundColor }
+							overlayTextColor={ overlayTextColor }
 						>
 							{ isEntityAvailable && (
 								<NavigationInnerBlocks
