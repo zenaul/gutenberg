@@ -114,6 +114,22 @@ class WP_Style_Engine_CSS_Declarations {
 	}
 
 	/**
+	 * Filters a CSS property + value pair.
+	 *
+	 * @param string $property The CSS property.
+	 * @param string $value    The value to be filtered.
+	 * @param string $spacer   The spacer between the colon and the value. Defaults to an empty string.
+	 *
+	 * @return string The filtered declaration as a single string.
+	 */
+	protected static function filter_declaration( $property, $value, $spacer = '' ) {
+		if ( isset( $property ) && isset( $value ) ) {
+			return safecss_filter_attr( "{$property}:{$spacer}{$value}" );
+		}
+		return '';
+	}
+
+	/**
 	 * Filters and compiles the CSS declarations.
 	 *
 	 * @param boolean $should_prettify Whether to add spacing, new lines and indents.
@@ -130,17 +146,11 @@ class WP_Style_Engine_CSS_Declarations {
 		$spacer              = $should_prettify ? ' ' : '';
 
 		foreach ( $declarations_array as $property => $value ) {
-			if (
-				0 === strpos( $property, '--' ) || // Account for CSS variables.
-				( 'display' === $property && 'none' !== $value ) || // Account for "display" when the value is not "none".
-				0 === strpos( $value, 'min(' ) || // Account for min() values.
-				0 === strpos( $value, 'max(' ) || // Account for max() values.
-				0 === strpos( $value, 'clamp(' ) // Account for clamp() values.
-			) {
+			if ( 0 === strpos( $property, '--' ) ) { || // Account for CSS variables.
 				$declarations_output .= "{$indent}{$property}:{$spacer}{$value};$suffix";
 				continue;
 			}
-			$filtered_declaration = safecss_filter_attr( "{$property}:{$spacer}{$value}" );
+			$filtered_declaration = static::filter_declaration( $property, $value, $spacer );
 			if ( $filtered_declaration ) {
 				$declarations_output .= "{$indent}{$filtered_declaration};$suffix";
 			}
