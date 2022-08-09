@@ -17,6 +17,12 @@ if ( class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
  * @access private
  */
 class WP_Style_Engine_CSS_Declarations {
+	/**
+	 * An array of valid CSS custom properties.
+	 */
+	const VALID_CUSTOM_PROPERTIES = array(
+		'--wp--style--unstable-gallery-gap',
+	);
 
 	/**
 	 * An array of CSS declarations (property => value pairs).
@@ -120,6 +126,10 @@ class WP_Style_Engine_CSS_Declarations {
 	 * @return string The filtered declaration as a single string.
 	 */
 	protected static function filter_declaration( $property, $value, $spacer = '' ) {
+		// Allow CSS custom properties starting with `--wp--`.
+		if ( in_array( $property, static::VALID_CUSTOM_PROPERTIES, true ) ) {
+			return "{$property}:{$spacer}{$value}";
+		}
 		return safecss_filter_attr( "{$property}:{$spacer}{$value}" );
 	}
 
