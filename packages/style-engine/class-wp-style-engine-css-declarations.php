@@ -146,7 +146,7 @@ class WP_Style_Engine_CSS_Declarations {
 		$spacer              = $should_prettify ? ' ' : '';
 
 		foreach ( $declarations_array as $property => $value ) {
-			if ( 0 === strpos( $property, '--' ) ) { || // Account for CSS variables.
+			if ( 0 === strpos( $property, '--' ) ) { // Account for CSS variables.
 				$declarations_output .= "{$indent}{$property}:{$spacer}{$value};$suffix";
 				continue;
 			}
