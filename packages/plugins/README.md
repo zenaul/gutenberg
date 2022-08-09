@@ -82,6 +82,7 @@ _Usage_
 // Using ES5 syntax
 var el = wp.element.createElement;
 var Fragment = wp.element.Fragment;
+// In the site editor, import PluginSidebar and PluginSidebarMoreMenuItem from wp.editSite instead.
 var PluginSidebar = wp.editPost.PluginSidebar;
 var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
 var registerPlugin = wp.plugins.registerPlugin;
@@ -117,6 +118,8 @@ registerPlugin( 'plugin-name', {
 
 ```js
 // Using ESNext syntax
+
+// In the site editor, import PluginSidebar and PluginSidebarMoreMenuItem from @wordpress/edit-site instead.
 import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
 import { registerPlugin } from '@wordpress/plugins';
 import { more } from '@wordpress/icons';
