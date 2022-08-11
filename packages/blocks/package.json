@@ -44,8 +44,8 @@
 		"colord": "^2.7.0",
 		"hpq": "^1.3.0",
 		"lodash": "^4.17.21",
-		"markdown-it": "13.0.1",
 		"memize": "^1.1.0",
+		"micromark": "3.0.10",
 		"rememo": "^4.0.0",
 		"simple-html-tokenizer": "^0.5.7",
 		"uuid": "^8.3.0"
