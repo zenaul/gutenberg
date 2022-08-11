@@ -21,7 +21,7 @@ class WP_Style_Engine_CSS_Declarations {
 	 * An array of valid CSS custom properties.
 	 */
 	const VALID_CUSTOM_PROPERTIES = array(
-		'--wp--style--unstable-gallery-gap',
+		'--wp--style--unstable-gallery-gap' => 'gap',
 	);
 
 	/**
@@ -126,9 +126,11 @@ class WP_Style_Engine_CSS_Declarations {
 	 * @return string The filtered declaration as a single string.
 	 */
 	protected static function filter_declaration( $property, $value, $spacer = '' ) {
-		// Allow CSS custom properties starting with `--wp--`.
-		if ( in_array( $property, static::VALID_CUSTOM_PROPERTIES, true ) ) {
-			return "{$property}:{$spacer}{$value}";
+		// Allow a specific list of CSS custom properties contained in static::VALID_CUSTOM_PROPERTIES,
+		// until safecss_filter_attr in Core permits CSS custom properties.
+		if ( isset( static::VALID_CUSTOM_PROPERTIES[ $property ] ) ) {
+			return safecss_filter_attr( static::VALID_CUSTOM_PROPERTIES[ $property ] . ":{$spacer}{$value}" ) ?
+				"{$property}:{$spacer}{$value}" : '';
 		}
 		return safecss_filter_attr( "{$property}:{$spacer}{$value}" );
 	}
