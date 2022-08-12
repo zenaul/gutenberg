@@ -49,7 +49,10 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		if ( ! empty( $attributes['scale'] ) ) {
 			$image_styles .= "object-fit:{$attributes['scale']};";
 		}
-		$featured_image = str_replace( 'src=', 'style="' . esc_attr( $image_styles ) . '" src=', $featured_image );
+		$walker = new WP_HTML_Walker( $featured_image );
+		$walker->next_tag( 'img' );
+		$walker->set_attribute( 'style', $image_styles );
+		$featured_image = (string) $walker;
 	}
 
 	return "<figure $wrapper_attributes>$featured_image</figure>";
