@@ -19,10 +19,12 @@ function render_block_core_image( $attributes, $content ) {
 		// to provide backwards compatibility for the Gallery Block,
 		// which now wraps Image Blocks within innerBlocks.
 		// The data-id attribute is added in a core/gallery `render_block_data` hook.
-		$data_id_attribute = 'data-id="' . esc_attr( $attributes['data-id'] ) . '"';
-		if ( false === strpos( $content, $data_id_attribute ) ) {
-			$content = str_replace( '<img', '<img ' . $data_id_attribute . ' ', $content );
+		$walker = new WP_HTML_Walker( $content );
+		$walker->next_tag( 'img' );
+		if ( $walker->get_attribute( 'data-id' ) !== $attributes['data-id'] ) {
+			$walker->set_tag_attribute( 'data-id', $attributes['data-id'] );
 		}
+		$content = (string) $walker;
 	}
 	return $content;
 }
