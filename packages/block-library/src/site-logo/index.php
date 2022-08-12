@@ -42,7 +42,7 @@ function render_block_core_site_logo( $attributes ) {
 		$walker = new WP_HTML_Walker( $custom_logo );
 		$walker->next_tag( 'a' );
 		if ( 'home' === $walker->get_attribute( 'rel' ) ) {
-			$walker->set_attribute( 'aria-label', '(Home link, opens in a new tab)' );
+			$walker->set_attribute( 'aria-label', __( '(Home link, opens in a new tab)' ) );
 			$walker->set_attribute( 'target', $attributes['linkTarget'] );
 		}
 		$custom_logo = (string) $walker;

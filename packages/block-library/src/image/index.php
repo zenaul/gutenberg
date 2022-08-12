@@ -21,8 +21,8 @@ function render_block_core_image( $attributes, $content ) {
 		// The data-id attribute is added in a core/gallery `render_block_data` hook.
 		$walker = new WP_HTML_Walker( $content );
 		$walker->next_tag( 'img' );
-		if ( $walker->get_attribute( 'data-id' ) !== $attributes['data-id'] ) {
-			$walker->set_tag_attribute( 'data-id', $attributes['data-id'] );
+		if ( $walker->get_attribute( 'data-id' ) !== esc_attr( $attributes['data-id'] ) ) {
+			$walker->set_attribute( 'data-id', $attributes['data-id'] );
 		}
 		$content = (string) $walker;
 	}
