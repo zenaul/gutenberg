@@ -143,6 +143,8 @@ describe( 'undo', () => {
 			endOffset: 'before keyboard '.length,
 		} );
 
+		// Undo the collapsed bold command.
+		await pressKeyWithModifier( 'primary', 'z' );
 		await pressKeyWithModifier( 'primary', 'z' );
 
 		expect( await getEditedPostContent() ).toBe( '' );
@@ -163,6 +165,8 @@ describe( 'undo', () => {
 			endOffset: 'before keyboard '.length,
 		} );
 
+		// Redo the collapsed bold command.
+		await pressKeyWithModifier( 'primaryShift', 'z' );
 		await pressKeyWithModifier( 'primaryShift', 'z' );
 
 		expect( await getEditedPostContent() ).toBe( after );
