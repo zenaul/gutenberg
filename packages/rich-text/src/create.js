@@ -14,6 +14,7 @@ import {
 	OBJECT_REPLACEMENT_CHARACTER,
 	ZWNBSP,
 } from './special-characters';
+import { toHTMLString } from './to-html-string';
 
 /**
  * @typedef {Object} RichTextFormat
@@ -24,6 +25,18 @@ import {
 /**
  * @typedef {Array<RichTextFormat>} RichTextFormatList
  */
+
+export function RichTextValue( value ) {
+	for ( const key of Object.getOwnPropertyNames( value ) ) {
+		this[ key ] = value[ key ];
+	}
+
+	return this;
+}
+
+RichTextValue.prototype.toString = function () {
+	return toHTMLString( { value: { ...this } } );
+};
 
 /**
  * @typedef {Object} RichTextValue
@@ -36,11 +49,11 @@ import {
  */
 
 function createEmptyValue() {
-	return {
+	return new RichTextValue( {
 		formats: [],
 		replacements: [],
 		text: '',
-	};
+	} );
 }
 
 function toFormat( { type, attributes } ) {
@@ -174,11 +187,11 @@ export function create( {
 	preserveWhiteSpace,
 } = {} ) {
 	if ( typeof text === 'string' && text.length > 0 ) {
-		return {
+		return new RichTextValue( {
 			formats: Array( text.length ),
 			replacements: Array( text.length ),
 			text,
-		};
+		} );
 	}
 
 	if ( typeof html === 'string' && html.length > 0 ) {
