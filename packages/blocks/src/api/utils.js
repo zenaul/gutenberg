@@ -57,10 +57,16 @@ export function isUnmodifiedDefaultBlock( block ) {
 	const newDefaultBlock = isUnmodifiedDefaultBlock.block;
 	const blockType = getBlockType( defaultBlockName );
 
+	function valueOf( value ) {
+		return typeof value === 'object' ? value.valueOf() : value;
+	}
+
 	return every(
 		blockType?.attributes,
 		( value, key ) =>
-			newDefaultBlock.attributes[ key ] === block.attributes[ key ]
+			// Allow attribute value to specify primitive value to compare.
+			valueOf( newDefaultBlock.attributes[ key ] ) ===
+			valueOf( block.attributes[ key ] )
 	);
 }
 

@@ -20,7 +20,7 @@ import { useIndentListItemOnSpace } from './use-indent-list-item-on-space';
 import { useInputAndSelection } from './use-input-and-selection';
 import { useDelete } from './use-delete';
 
-class RichTextValue extends String {
+export class RichTextValue extends String {
 	constructor( { value } ) {
 		super( toHTMLString( ...arguments ) );
 
