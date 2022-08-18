@@ -16,22 +16,28 @@
 class Gutenberg_REST_Block_Patterns_Controller extends WP_REST_Controller {
 
 	/**
+	 * The namespace of this controller's route.
+	 *
+	 * @since 6.1.0
+	 * @var string
+	 */
+	protected $namespace = 'wp/v2';
+
+	/**
+	 * The base of this controller's route.
+	 *
+	 * @since 6.1.0
+	 * @var string
+	 */
+	protected $rest_base = 'block-patterns/patterns';
+
+	/**
 	 * Defines whether remote patterns should be loaded.
 	 *
 	 * @since 6.0.0
 	 * @var bool
 	 */
 	private $remote_patterns_loaded;
-
-	/**
-	 * Constructs the controller.
-	 *
-	 * @since 6.0.0
-	 */
-	public function __construct() {
-		$this->namespace = 'wp/v2';
-		$this->rest_base = 'block-patterns/patterns';
-	}
 
 	/**
 	 * Registers the routes for the objects of the controller.
