@@ -52,11 +52,14 @@ const Template: ComponentStory< typeof DateTimePicker > = ( {
 export const Default: ComponentStory< typeof DateTimePicker > = Template.bind(
 	{}
 );
+Default.args = {
+	currentDate: new Date( 'December 17, 2022 03:24:00' ),
+};
 
 export const WithEvents: ComponentStory< typeof DateTimePicker > =
 	Template.bind( {} );
 WithEvents.args = {
-	currentDate: new Date(),
+	...Default.args,
 	events: [
 		{ date: daysFromNow( 2 ) },
 		{ date: daysFromNow( 4 ) },
@@ -68,6 +71,6 @@ WithEvents.args = {
 export const WithInvalidDates: ComponentStory< typeof DateTimePicker > =
 	Template.bind( {} );
 WithInvalidDates.args = {
-	currentDate: new Date(),
+	...Default.args,
 	isInvalidDate: isWeekend,
 };

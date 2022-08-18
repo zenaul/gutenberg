@@ -49,3 +49,6 @@ const Template: ComponentStory< typeof TimePicker > = ( {
 };
 
 export const Default: ComponentStory< typeof TimePicker > = Template.bind( {} );
+Default.args = {
+	currentTime: new Date( 'December 17, 2022 03:24:00' ),
+};
