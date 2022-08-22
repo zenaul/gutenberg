@@ -17,6 +17,7 @@ const includeIds = [ /^components-/ ];
 const excludeIds = [ /animate/, /zstack/ ];
 
 const filterMatches = ( story: StoryIndexEntry ) => {
+	// return story.id.includes( 'components-fontsizepicker--default' );
 	const isIncluded = includeIds.some( ( includeRegex ) =>
 		includeRegex.test( story.id )
 	);
@@ -34,15 +35,37 @@ test.describe.parallel( 'Storybook visual regressions', () => {
 				await page.goto(
 					`http://localhost:${ STORYBOOK_PORT }/iframe.html?id=${ story.id }`
 				);
+
+				// Option A: Debounce the screenshot by waiting until DOM mutations stop.
 				await page.evaluate(
 					() =>
 						new Promise( ( res, rej ) => {
-							document.addEventListener( 'transitionend', () =>
-								res( true )
-							);
-							setTimeout( () => res( false ), 500 );
+							const rootEl = document.querySelector( '#root' );
+
+							let mutationTimer = setTimeout( res, 200 );
+							const observer = new MutationObserver( () => {
+								clearTimeout( mutationTimer );
+								mutationTimer = setTimeout( res, 200 );
+							} );
+
+							observer.observe( rootEl, {
+								subtree: true,
+								childList: true,
+								attributes: true,
+							} );
 						} )
 				);
+
+				// Option B: Wait for transitionend to be fired.
+				// await page.evaluate(
+				// 	() =>
+				// 		new Promise( ( res, rej ) => {
+				// 			document.addEventListener( 'transitionend', () =>
+				// 				res( true )
+				// 			);
+				// 			setTimeout( () => res( false ), 500 );
+				// 		} )
+				// );
 				// await page.pause();
 				expect(
 					await page
