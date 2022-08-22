@@ -32,9 +32,18 @@ test.describe.parallel( 'Storybook visual regressions', () => {
 		.forEach( ( story ) => {
 			test( `${ story.title }: ${ story.name }`, async ( { page } ) => {
 				await page.goto(
-					`http://localhost:${ STORYBOOK_PORT }/iframe.html?id=${ story.id }`,
-					{ waitUntil: 'load' }
+					`http://localhost:${ STORYBOOK_PORT }/iframe.html?id=${ story.id }`
 				);
+				await page.evaluate(
+					() =>
+						new Promise( ( res, rej ) => {
+							document.addEventListener( 'transitionend', () =>
+								res( true )
+							);
+							setTimeout( () => res( false ), 500 );
+						} )
+				);
+				// await page.pause();
 				expect(
 					await page
 						.locator( '#root' )

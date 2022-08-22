@@ -8,6 +8,9 @@ const config: PlaywrightTestConfig = {
 	reporter: [
 		[ 'html', { open: 'on-failure', outputFolder: 'test-results/report' } ],
 	],
+	// use: {
+	// 	headless: false,
+	// },
 };
 
 export default config;
