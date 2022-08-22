@@ -31,7 +31,7 @@
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
 		"@react-native-clipboard/clipboard": "1.9.0",
-		"@react-native-community/blur": "3.6.0",
+		"@react-native-community/blur": "4.2.0",
 		"@react-native-community/slider": "https://raw.githubusercontent.com/wordpress-mobile/react-native-slider/v3.0.2-wp-2/react-native-community-slider-3.0.2-wp-2.tgz",
 		"@react-native-masked-view/masked-view": "0.2.6",
 		"@react-navigation/core": "5.12.0",
@@ -73,7 +73,7 @@
 		"react-native-screens": "2.9.0",
 		"react-native-svg": "9.13.6",
 		"react-native-url-polyfill": "^1.1.2",
-		"react-native-video": "https://raw.githubusercontent.com/wordpress-mobile/react-native-video/5.2.0-wp-2/react-native-video-5.2.0-wp-2.tgz",
+		"react-native-video": "https://raw.githubusercontent.com/wordpress-mobile/react-native-video/update-for-0.69/react-native-video-5.2.0-wp-3.tgz",
 		"react-native-webview": "11.6.2"
 	},
 	"publishConfig": {
