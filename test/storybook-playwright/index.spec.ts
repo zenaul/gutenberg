@@ -32,6 +32,8 @@ test.describe.parallel( 'Storybook visual regressions', () => {
 		.filter( filterMatches )
 		.forEach( ( story ) => {
 			test( `${ story.title }: ${ story.name }`, async ( { page } ) => {
+				await page.emulateMedia( { reducedMotion: 'reduce' } );
+
 				await page.goto(
 					`http://localhost:${ STORYBOOK_PORT }/iframe.html?id=${ story.id }`
 				);
