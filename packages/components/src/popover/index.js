@@ -25,7 +25,6 @@ import {
 	createContext,
 	useContext,
 	useMemo,
-	useEffect,
 } from '@wordpress/element';
 import {
 	useViewportMatch,
@@ -197,11 +196,6 @@ const Popover = (
 	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
 	 */
 	const frameOffsetRef = useRef( getFrameOffset( referenceOwnerDocument ) );
-	/**
-	 * Store the offset prop in a ref, due to constraints with floating-ui:
-	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
-	 */
-	const offsetRef = useRef( offsetProp );
 
 	const middleware = [
 		// Custom middleware which adjusts the popover's position by taking into
@@ -289,11 +283,6 @@ const Popover = (
 		placement: computedPlacement,
 		middlewareData: { arrow: arrowData = {} },
 	} = useFloating( { placement: normalizedPlacementFromProps, middleware } );
-
-	useEffect( () => {
-		offsetRef.current = offsetProp;
-		update();
-	}, [ offsetProp, update ] );
 
 	// Update the `reference`'s ref.
 	//
