@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useRef } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import { __unstableIframe as Iframe } from '@wordpress/block-editor';
 
 /**
@@ -107,18 +107,26 @@ export const Default = ( args ) => {
 	const toggleVisible = () => {
 		setIsVisible( ( state ) => ! state );
 	};
+	const buttonRef = useRef();
+	useEffect( () => {
+		buttonRef.current?.focus();
+	}, [] );
 
 	return (
 		<div
 			style={ {
-				minWidth: '600px',
-				minHeight: '600px',
+				width: '300vw',
+				height: '300vh',
 				display: 'flex',
 				alignItems: 'center',
 				justifyContent: 'center',
 			} }
 		>
-			<Button variant="secondary" onClick={ toggleVisible }>
+			<Button
+				variant="secondary"
+				onClick={ toggleVisible }
+				ref={ buttonRef }
+			>
 				Toggle Popover
 				{ isVisible && <Popover { ...args } /> }
 			</Button>
