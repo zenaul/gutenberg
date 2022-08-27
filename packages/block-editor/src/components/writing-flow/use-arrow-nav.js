@@ -37,18 +37,19 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
 
 	// Native inputs should not navigate vertically, unless they are simple types that don't need up/down arrow keys.
 	if ( isVertical && ! hasModifier ) {
-		const vertiaclInputTypes = [
-			'date',
-			'datetime-local',
-			'month',
-			'number',
-			'range',
-			'time',
-			'week',
-		];
-		return (
-			tagName !== 'INPUT' && ! vertiaclInputTypes.includes( elementType )
-		);
+		if ( tagName === 'INPUT' ) {
+			const vertiaclInputTypes = [
+				'date',
+				'datetime-local',
+				'month',
+				'number',
+				'range',
+				'time',
+				'week',
+			];
+			return ! vertiaclInputTypes.includes( elementType );
+		}
+		return true;
 	}
 
 	// Native inputs should not navigate horizontally, unless they are simple types that don't need left/right arrow keys.
