@@ -57,6 +57,7 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
 		const simpleInputTypes = [
 			'button',
 			'checkbox',
+			'number',
 			'color',
 			'file',
 			'image',
