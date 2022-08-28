@@ -293,7 +293,7 @@ Create a link that always points to the homepage of the site. Usually not necess
 
 -	**Name:** core/home-link
 -	**Category:** design
--	**Supports:** ~~html~~, ~~reusable~~
+-	**Supports:** typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
 ## Custom HTML
@@ -329,7 +329,7 @@ Display a list of your most recent posts. ([Source](https://github.com/WordPress
 
 -	**Name:** core/latest-posts
 -	**Category:** widgets
--	**Supports:** align, ~~html~~
+-	**Supports:** align, typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** addLinkToFeaturedImage, categories, columns, displayAuthor, displayFeaturedImage, displayPostContent, displayPostContentRadio, displayPostDate, excerptLength, featuredImageAlign, featuredImageSizeHeight, featuredImageSizeSlug, featuredImageSizeWidth, order, orderBy, postLayout, postsToShow, selectedAuthor
 
 ## List
@@ -617,7 +617,7 @@ Contains the block elements used to render content when no query results are fou
 
 -	**Name:** core/query-no-results
 -	**Category:** theme
--	**Supports:** align, color (background, gradients, link, text), ~~html~~, ~~reusable~~
+-	**Supports:** align, color (background, gradients, link, text), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** 
 
 ## Pagination
