@@ -101,6 +101,10 @@ describe( 'Toolbar roving tabindex', () => {
 
 	it( 'ensures table block toolbar uses roving tabindex', async () => {
 		await insertBlock( 'Table' );
+		// Focus "Create Table" button in advance because the block wrapper doesn't get
+		// focus when Up Arrow is pressed in input number field.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
 		await testBlockToolbarKeyboardNavigation( 'Block: Table', 'Table' );
 		// Move focus to the first toolbar item.
 		await page.keyboard.press( 'Home' );
