@@ -90,7 +90,7 @@ function ScreenTypography( { name } ) {
 			{ ! name && (
 				<div className="edit-site-global-styles-screen-typography">
 					<VStack spacing={ 3 }>
-						<Subtitle>{ __( 'Elements' ) }</Subtitle>
+						<Subtitle level={ 3 }>{ __( 'Elements' ) }</Subtitle>
 						<ItemGroup isBordered isSeparated>
 							<Item
 								name={ name }
