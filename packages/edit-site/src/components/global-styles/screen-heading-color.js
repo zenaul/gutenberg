@@ -121,7 +121,7 @@ function ScreenHeadingColor( { name } ) {
 				) }
 			/>
 			<div className="edit-site-global-styles-screen-heading-color">
-				<h4>{ __( 'Select heading level' ) }</h4>
+				<h3>{ __( 'Select heading level' ) }</h3>
 
 				<ToggleGroupControl
 					label={ __( 'Select heading level' ) }
@@ -132,8 +132,7 @@ function ScreenHeadingColor( { name } ) {
 				>
 					<ToggleGroupControlOption
 						value="heading"
-						/* translators: 'All' refers to selecting all heading levels 
-						and applying the same style to h1-h6. */
+						/* translators: 'All' refers to selecting all heading levels and applying the same style to h1-h6. */
 						label={ __( 'All' ) }
 					/>
 					<ToggleGroupControlOption value="h1" label={ __( 'H1' ) } />
@@ -146,7 +145,7 @@ function ScreenHeadingColor( { name } ) {
 			</div>
 			{ hasTextColor && (
 				<div className="edit-site-global-styles-screen-heading-color">
-					<h4>
+					<h3>
 						{ selectedLevel === 'heading'
 							? __( 'Text color for all heading levels' )
 							: sprintf(
@@ -154,7 +153,7 @@ function ScreenHeadingColor( { name } ) {
 									__( 'Text color for %s' ),
 									selectedLevel.toUpperCase()
 							  ) }
-					</h4>
+					</h3>
 					<ColorGradientControl
 						className="edit-site-screen-heading-text-color__control"
 						colors={ colorsPerOrigin }
@@ -166,12 +165,13 @@ function ScreenHeadingColor( { name } ) {
 						colorValue={ color }
 						onColorChange={ setColor }
 						clearable={ color === userColor }
+						headingLevel={ 4 }
 					/>
 				</div>
 			) }
 			{ hasBackgroundColor && (
 				<div className="edit-site-global-styles-screen-heading-color">
-					<h4>
+					<h3>
 						{ selectedLevel === 'heading'
 							? __( 'Background color for all heading levels' )
 							: sprintf(
@@ -179,7 +179,7 @@ function ScreenHeadingColor( { name } ) {
 									__( 'Background color for %s' ),
 									selectedLevel.toUpperCase()
 							  ) }
-					</h4>
+					</h3>
 					<ColorGradientControl
 						className="edit-site-screen-heading-background-color__control"
 						colors={ colorsPerOrigin }
@@ -190,6 +190,7 @@ function ScreenHeadingColor( { name } ) {
 						showTitle={ false }
 						enableAlpha
 						__experimentalIsRenderedInSidebar
+						headingLevel={ 4 }
 						{ ...controlProps }
 					/>
 				</div>

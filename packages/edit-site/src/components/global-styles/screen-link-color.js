@@ -100,6 +100,7 @@ function ScreenLinkColor( { name } ) {
 									pseudoSelectorConfig.value ===
 									pseudoSelectorConfig.userValue
 								}
+								headingLevel={ 3 }
 							/>
 						</>
 					);

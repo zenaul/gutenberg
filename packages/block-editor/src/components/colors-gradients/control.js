@@ -56,6 +56,7 @@ function ColorGradientControlInner( {
 	clearable,
 	showTitle = true,
 	enableAlpha,
+	headingLevel,
 } ) {
 	const canChooseAColor =
 		onColorChange && ( ! isEmpty( colors ) || ! disableCustomColors );
@@ -88,6 +89,7 @@ function ColorGradientControlInner( {
 				}
 				clearable={ clearable }
 				enableAlpha={ enableAlpha }
+				headingLevel={ headingLevel }
 			/>
 		),
 		[ TAB_GRADIENT.value ]: (
@@ -110,6 +112,7 @@ function ColorGradientControlInner( {
 					__experimentalIsRenderedInSidebar
 				}
 				clearable={ clearable }
+				headingLevel={ headingLevel }
 			/>
 		),
 	};

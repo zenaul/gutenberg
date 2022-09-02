@@ -62,9 +62,9 @@ function ScreenButtonColor( { name } ) {
 				) }
 			/>
 
-			<h4 className="edit-site-global-styles-section-title">
+			<h3 className="edit-site-global-styles-section-title">
 				{ __( 'Text color' ) }
-			</h4>
+			</h3>
 
 			<ColorGradientControl
 				className="edit-site-screen-button-color__control"
@@ -77,11 +77,12 @@ function ScreenButtonColor( { name } ) {
 				colorValue={ buttonTextColor }
 				onColorChange={ setButtonTextColor }
 				clearable={ buttonTextColor === userButtonTextColor }
+				headingLevel={ 4 }
 			/>
 
-			<h4 className="edit-site-global-styles-section-title">
+			<h3 className="edit-site-global-styles-section-title">
 				{ __( 'Background color' ) }
-			</h4>
+			</h3>
 
 			<ColorGradientControl
 				className="edit-site-screen-button-color__control"
@@ -94,6 +95,7 @@ function ScreenButtonColor( { name } ) {
 				colorValue={ buttonBgColor }
 				onColorChange={ setButtonBgColor }
 				clearable={ buttonBgColor === userButtonBgColor }
+				headingLevel={ 4 }
 			/>
 		</>
 	);

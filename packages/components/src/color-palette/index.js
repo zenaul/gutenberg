@@ -90,13 +90,16 @@ function MultiplePalettes( {
 	onChange,
 	value,
 	actions,
+	headingLevel,
 } ) {
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ colors.map( ( { name, colors: colorPalette }, index ) => {
 				return (
 					<VStack spacing={ 2 } key={ index }>
-						<ColorHeading>{ name }</ColorHeading>
+						<ColorHeading level={ headingLevel }>
+							{ name }
+						</ColorHeading>
 						<SinglePalette
 							clearColor={ clearColor }
 							colors={ colorPalette }
@@ -196,6 +199,7 @@ export default function ColorPalette( {
 	value,
 	__experimentalHasMultipleOrigins = false,
 	__experimentalIsRenderedInSidebar = false,
+	headingLevel = 2,
 } ) {
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
 	const showMultiplePalettes =
@@ -299,6 +303,7 @@ export default function ColorPalette( {
 						</CircularOptionPicker.ButtonAction>
 					)
 				}
+				headingLevel={ headingLevel }
 			/>
 		</VStack>
 	);

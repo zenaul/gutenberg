@@ -54,6 +54,7 @@ function ScreenTextColor( { name } ) {
 				colorValue={ color }
 				onColorChange={ setColor }
 				clearable={ color === userColor }
+				headingLevel={ 3 }
 			/>
 		</>
 	);

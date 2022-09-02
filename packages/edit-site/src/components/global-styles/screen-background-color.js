@@ -100,6 +100,7 @@ function ScreenBackgroundColor( { name } ) {
 				showTitle={ false }
 				enableAlpha
 				__experimentalIsRenderedInSidebar
+				headingLevel={ 3 }
 				{ ...controlProps }
 			/>
 		</>
