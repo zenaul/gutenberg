@@ -536,6 +536,7 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
         },
       ]
     }
+    headingLevel={2}
     onChange={[MockFunction]}
     value="#f00"
   />
@@ -909,6 +910,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
               },
             ]
           }
+          headingLevel={2}
           key=".1"
           onChange={[MockFunction]}
           value="#f00"
