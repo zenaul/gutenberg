@@ -150,6 +150,7 @@ const ToolsPanelHeader = (
 		dropdownMenuClassName,
 		hasMenuItems,
 		headingClassName,
+		headingLevel = 2,
 		label: labelText,
 		menuItems,
 		resetAll,
@@ -179,7 +180,7 @@ const ToolsPanelHeader = (
 
 	return (
 		<HStack { ...headerProps } ref={ forwardedRef }>
-			<Heading level={ 2 } className={ headingClassName }>
+			<Heading level={ headingLevel } className={ headingClassName }>
 				{ labelText }
 			</Heading>
 			{ hasMenuItems && (
