@@ -249,6 +249,115 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 }
 
 /**
+ * Builds the title and description of a post specific template based on the underlying post referenced.
+ *
+ * @access private
+ * @internal
+ *
+ * @param string                   $post_type Post type e.g:page, post, product.
+ * @param string                   $slug      Slug of the post e.g:a-story-about-shoes.
+ * @param Gutenberg_Block_Template $template  Template whose description and title are going to be computed.
+ */
+function _gutenberg_build_title_and_description_for_single_post_type_block_template( $post_type, $slug, &$template ) {
+	$post_type_object = get_post_type_object( $post_type );
+
+	$posts = get_posts(
+		array(
+			'name'      => $slug,
+			'post_type' => $post_type,
+		)
+	);
+	if ( empty( $posts ) ) {
+		return;
+	}
+
+	$post_title = $posts[0]->post_title;
+
+	$template->title = sprintf(
+		// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the singular name of a post type and %2$s is the name of the post, e.g. "Page: Hello".
+		__( '%1$s: %2$s', 'gutenberg' ),
+		$post_type_object->labels->singular_name,
+		$post_title
+	);
+	$template->description = sprintf(
+		// translators: Represents the description of a user's custom template in the Site Editor, e.g. "Template for Page: Hello".
+		__( 'Template for %1$s', 'gutenberg' ),
+		$post_title
+	);
+
+	$posts_with_same_title = get_posts(
+		array(
+			'title'       => $post_title,
+			'post_type'   => $post_type,
+			'post_status' => 'publish',
+		)
+	);
+	if ( count( $posts_with_same_title ) > 1 ) {
+		$template->title = sprintf(
+			// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the template title and %2$s is the slug of the post type, e.g. "Project: Hello (project_type)".
+			__( '%1$s (%2$s)', 'gutenberg' ),
+			$template->title,
+			$slug
+		);
+	}
+}
+
+/**
+ * Builds the title and description of a taxonomy specific template based on the underlying entity referenced.
+ *
+ * @access private
+ * @internal
+ *
+ * @param string                   $taxonomy Idenfitier of the taxonomy e.g:category.
+ * @param string                   $slug     Slug of the term e.g:shoes.
+ * @param Gutenberg_Block_Template $template Template whose description and title are going to be computed.
+ */
+function _gutenberg_build_title_and_description_for_taxonomy_block_template( $taxonomy, $slug, &$template ) {
+	$terms = get_terms(
+		array(
+			'taxonomy'   => $taxonomy,
+			'hide_empty' => false,
+			'slug'       => $slug,
+		)
+	);
+	if ( empty( $terms ) ) {
+		return;
+	}
+
+	$term_title = $terms[0]->name;
+
+	$taxonomy_object = get_taxonomy( $taxonomy );
+
+	$template->title = sprintf(
+		// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the singular name of a taxonomy and %2$s is the name of the term, e.g. "Category: shoes".
+		__( '%1$s: %2$s', 'gutenberg' ),
+		$taxonomy_object->labels->singular_name,
+		$term_title
+	);
+	$template->description = sprintf(
+		// translators: Represents the description of a user's custom template in the Site Editor, e.g. "Template for Category: shoes".
+		__( 'Template for %1$s', 'gutenberg' ),
+		$term_title
+	);
+
+	$terms_with_same_title = get_terms(
+		array(
+			'taxonomy'   => $taxonomy,
+			'hide_empty' => false,
+			'name'       => $term_title,
+		)
+	);
+	if ( count( $terms_with_same_title ) > 1 ) {
+		$template->title = sprintf(
+			// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the template title and %2$s is the slug of the taxonomy, e.g. "Category: shoes (product_tag)".
+			__( '%1$s (%2$s)', 'gutenberg' ),
+			$template->title,
+			$slug
+		);
+	}
+}
+
+/**
  * Build a unified template object based a post Object.
  *
  * @param WP_Post $post Template post.
@@ -303,6 +412,84 @@ function gutenberg_build_block_template_result_from_post( $post ) {
 		$type_terms = get_the_terms( $post, 'wp_template_part_area' );
 		if ( ! is_wp_error( $type_terms ) && false !== $type_terms ) {
 			$template->area = $type_terms[0]->name;
+		}
+	}
+	if ( 'wp_template' === $post->post_type && empty( $template->description ) && ( empty( $template->title ) || $template->title === $template->slug ) ) {
+		$matches = array();
+		if ( preg_match( '/(author|page|single|tag|category|taxonomy)-(.+)/', $template->slug, $matches ) ) {
+			$type           = $matches[1];
+			$slug_remaining = $matches[2];
+			switch ( $type ) {
+				case 'author':
+					$nice_name = $slug_remaining;
+					$users     = get_users(
+						array(
+							'capability'     => 'publish_posts',
+							'search'         => $nice_name,
+							'search_columns' => array( 'user_nicename' ),
+							'fields'         => 'display_name',
+						)
+					);
+
+					if ( ! empty( $users ) ) {
+						$author_name = $users[0];
+
+						$template->title = sprintf(
+							// translators: Represents the title of a user's custom template in the Site Editor, where %s is the author's name, e.g. "Author: Jane Doe".
+							__( 'Author: %s', 'gutenberg' ),
+							$author_name
+						);
+						$template->description = sprintf(
+							// translators: Represents the description of a user's custom template in the Site Editor, e.g. "Template for Author: Jane Doe".
+							__( 'Template for %1$s', 'gutenberg' ),
+							$author_name
+						);
+
+						$users_with_same_name = get_users(
+							array(
+								'capability'     => 'publish_posts',
+								'search'         => $author_name,
+								'search_columns' => array( 'display_name' ),
+								'fields'         => 'display_name',
+							)
+						);
+						if ( count( $users_with_same_name ) > 1 ) {
+							$template->title = sprintf(
+								// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the template title of an author template and %2$s is the author nice name of the author, e.g. "Author: Jorge (jorge-costa)".
+								__( '%1$s (%2$s)', 'gutenberg' ),
+								$template->title,
+								$nice_name
+							);
+						}
+					}
+					break;
+				case 'page':
+					_gutenberg_build_title_and_description_for_single_post_type_block_template( 'page', $slug_remaining, $template );
+					break;
+				case 'single':
+					$single_matches = array();
+					$regex          = '/(' . implode( '|', array_values( get_post_types() ) ) . ')-(.+)/';
+					if ( preg_match( $regex, $slug_remaining, $single_matches ) ) {
+						$post_type = $single_matches[1];
+						$slug      = $single_matches[2];
+						_gutenberg_build_title_and_description_for_single_post_type_block_template( $post_type, $slug, $template );
+					}
+					break;
+				case 'tag':
+					_gutenberg_build_title_and_description_for_taxonomy_block_template( 'post_tag', $slug_remaining, $template );
+					break;
+				case 'category':
+					_gutenberg_build_title_and_description_for_taxonomy_block_template( 'category', $slug_remaining, $template );
+					break;
+				case 'taxonomy':
+					$taxonomy_matches = array();
+					if ( preg_match( '/(' . implode( '|', array_values( get_taxonomies() ) ) . ')-(.+)/', $slug_remaining, $taxonomy_matches ) ) {
+						$taxonomy = $taxonomy_matches[1];
+						$slug     = $taxonomy_matches[2];
+						_gutenberg_build_title_and_description_for_taxonomy_block_template( $taxonomy, $slug, $template );
+					}
+					break;
+			}
 		}
 	}
 	return $template;
