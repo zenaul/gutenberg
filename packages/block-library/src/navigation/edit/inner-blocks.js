@@ -40,6 +40,8 @@ export default function NavigationInnerBlocks( {
 	clientId,
 	hasCustomPlaceholder,
 	orientation,
+	kind,
+	type,
 } ) {
 	const {
 		isImmediateParentOfSelectedBlock,
@@ -69,10 +71,7 @@ export default function NavigationInnerBlocks( {
 		[ clientId ]
 	);
 
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
-		'postType',
-		'wp_navigation'
-	);
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor( kind, type );
 
 	const shouldDirectInsert = useMemo(
 		() =>

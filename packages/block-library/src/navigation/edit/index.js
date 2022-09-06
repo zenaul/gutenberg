@@ -42,6 +42,7 @@ import { close, Icon } from '@wordpress/icons';
  */
 import useNavigationMenu from '../use-navigation-menu';
 import useNavigationEntities from '../use-navigation-entities';
+import useNavigationEntityTypes from '../use-navigation-entity-types';
 import Placeholder from './placeholder';
 import ResponsiveWrapper from './responsive-wrapper';
 import NavigationInnerBlocks from './inner-blocks';
@@ -59,7 +60,8 @@ import useConvertClassicToBlockMenu, {
 } from './use-convert-classic-menu-to-block-menu';
 import useCreateNavigationMenu from './use-create-navigation-menu';
 import { useInnerBlocks } from './use-inner-blocks';
-import { detectColors } from './utils';
+import useGeneratedSlug from './use-generated-slug';
+import { detectColors, isNumeric } from './utils';
 
 function Navigation( {
 	attributes,
@@ -97,13 +99,15 @@ function Navigation( {
 
 	const ref = attributes.ref;
 
-	const setRef = ( postId ) => {
-		setAttributes( { ref: postId } );
+	const setRef = ( postSlug ) => {
+		setAttributes( { ref: postSlug } );
 	};
 
 	const recursionId = `navigationMenu/${ ref }`;
 	const hasAlreadyRendered = useHasRecursion( recursionId );
 	const { editEntityRecord } = useDispatch( coreStore );
+
+	const generatedSlug = useGeneratedSlug( clientId );
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
@@ -141,9 +145,8 @@ function Navigation( {
 		isError: createNavigationMenuIsError,
 	} = useCreateNavigationMenu( clientId );
 
-	const createUntitledEmptyNavigationMenu = () => {
-		createNavigationMenu( '' );
-	};
+	const createUntitledEmptyNavigationMenu = () =>
+		void createNavigationMenu( '', [], generatedSlug );
 
 	useEffect( () => {
 		hideNavigationMenuStatusNotice();
@@ -153,7 +156,7 @@ function Navigation( {
 		}
 
 		if ( createNavigationMenuIsSuccess ) {
-			handleUpdateMenu( createNavigationMenuPost.id, {
+			handleUpdateMenu( createNavigationMenuPost.slug, {
 				focusNavigationBlock: true,
 			} );
 
@@ -188,6 +191,7 @@ function Navigation( {
 		replaceInnerBlocks,
 		selectBlock,
 		__unstableMarkNextChangeAsNotPersistent,
+		__unstableMarkAutomaticChange,
 	} = useDispatch( blockEditorStore );
 
 	const [ hasSavedUnsavedInnerBlocks, setHasSavedUnsavedInnerBlocks ] =
@@ -212,6 +216,9 @@ function Navigation( {
 		isResolvingCanUserCreateNavigationMenu,
 		hasResolvedCanUserCreateNavigationMenu,
 	} = useNavigationMenu( ref );
+
+	const [ navigationEntityKind, navigationEntityType ] =
+		useNavigationEntityTypes( ref );
 
 	const navMenuResolvedButMissing =
 		hasResolvedNavigationMenus && isNavigationMenuMissing;
@@ -253,7 +260,7 @@ function Navigation( {
 		 *  nor to be undoable, hence why it is marked as non persistent
 		 */
 		__unstableMarkNextChangeAsNotPersistent();
-		setRef( fallbackNavigationMenus[ 0 ].id );
+		setRef( fallbackNavigationMenus[ 0 ].slug );
 	}, [ navigationMenus ] );
 
 	const navRef = useRef();
@@ -295,6 +302,15 @@ function Navigation( {
 
 	const isEntityAvailable =
 		! isNavigationMenuMissing && isNavigationMenuResolved;
+
+	// Migrate numerical ID-based ref to
+	// string slug-based ref.
+	useEffect( () => {
+		if ( isEntityAvailable && isNumeric( ref ) ) {
+			setRef( navigationMenu?.slug );
+			__unstableMarkAutomaticChange();
+		}
+	}, [ isEntityAvailable, ref, navigationMenu ] );
 
 	// "loading" state:
 	// - there is a menu creation process in progress.
@@ -348,11 +364,11 @@ function Navigation( {
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
 	const handleUpdateMenu = (
-		menuId,
+		menuRef,
 		options = { focusNavigationBlock: false }
 	) => {
 		const { focusNavigationBlock } = options;
-		setRef( menuId );
+		setRef( menuRef );
 		if ( focusNavigationBlock ) {
 			selectBlock( clientId );
 		}
@@ -630,8 +646,8 @@ function Navigation( {
 						<NavigationMenuSelector
 							currentMenuId={ ref }
 							clientId={ clientId }
-							onSelectNavigationMenu={ ( menuId ) => {
-								handleUpdateMenu( menuId );
+							onSelectNavigationMenu={ ( menuRef ) => {
+								handleUpdateMenu( menuRef );
 							} }
 							onSelectClassicMenu={ async ( classicMenu ) => {
 								const navMenu = await convertClassicMenu(
@@ -639,7 +655,7 @@ function Navigation( {
 									classicMenu.name
 								);
 								if ( navMenu ) {
-									handleUpdateMenu( navMenu.id, {
+									handleUpdateMenu( navMenu.slug, {
 										focusNavigationBlock: true,
 									} );
 								}
@@ -689,7 +705,7 @@ function Navigation( {
 							// Set some state used as a guard to prevent the creation of multiple posts.
 							setHasSavedUnsavedInnerBlocks( true );
 							// Switch to using the wp_navigation entity.
-							setRef( post.id );
+							setRef( post.slug );
 
 							showNavigationMenuStatusNotice(
 								__( `New Navigation Menu created.` )
@@ -711,8 +727,8 @@ function Navigation( {
 						<NavigationMenuSelector
 							currentMenuId={ null }
 							clientId={ clientId }
-							onSelectNavigationMenu={ ( menuId ) => {
-								handleUpdateMenu( menuId );
+							onSelectNavigationMenu={ ( menuRef ) => {
+								handleUpdateMenu( menuRef );
 							} }
 							onSelectClassicMenu={ async ( classicMenu ) => {
 								const navMenu = await convertClassicMenu(
@@ -720,7 +736,7 @@ function Navigation( {
 									classicMenu.name
 								);
 								if ( navMenu ) {
-									handleUpdateMenu( navMenu.id, {
+									handleUpdateMenu( navMenu.slug, {
 										focusNavigationBlock: true,
 									} );
 								}
@@ -796,8 +812,8 @@ function Navigation( {
 					isResolvingCanUserCreateNavigationMenu={
 						isResolvingCanUserCreateNavigationMenu
 					}
-					onSelectNavigationMenu={ ( menuId ) => {
-						handleUpdateMenu( menuId );
+					onSelectNavigationMenu={ ( menuRef ) => {
+						handleUpdateMenu( menuRef );
 					} }
 					onSelectClassicMenu={ async ( classicMenu ) => {
 						const navMenu = await convertClassicMenu(
@@ -805,7 +821,7 @@ function Navigation( {
 							classicMenu.name
 						);
 						if ( navMenu ) {
-							handleUpdateMenu( navMenu.id, {
+							handleUpdateMenu( navMenu.slug, {
 								focusNavigationBlock: true,
 							} );
 						}
@@ -817,15 +833,19 @@ function Navigation( {
 	}
 
 	return (
-		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
+		<EntityProvider
+			kind={ navigationEntityKind }
+			type={ navigationEntityType }
+			id={ ref }
+		>
 			<RecursionProvider uniqueId={ recursionId }>
 				<InspectorControls>
 					<PanelBody title={ __( 'Menu' ) }>
 						<NavigationMenuSelector
 							currentMenuId={ ref }
 							clientId={ clientId }
-							onSelectNavigationMenu={ ( menuId ) => {
-								handleUpdateMenu( menuId );
+							onSelectNavigationMenu={ ( menuRef ) => {
+								handleUpdateMenu( menuRef );
 							} }
 							onSelectClassicMenu={ async ( classicMenu ) => {
 								const navMenu = await convertClassicMenu(
@@ -833,7 +853,7 @@ function Navigation( {
 									classicMenu.name
 								);
 								if ( navMenu ) {
-									handleUpdateMenu( navMenu.id, {
+									handleUpdateMenu( navMenu.slug, {
 										focusNavigationBlock: true,
 									} );
 								}
@@ -867,11 +887,16 @@ function Navigation( {
 					<InspectorControls __experimentalGroup="advanced">
 						{ hasResolvedCanUserUpdateNavigationMenu &&
 							canUserUpdateNavigationMenu && (
-								<NavigationMenuNameControl />
+								<NavigationMenuNameControl
+									kind={ navigationEntityKind }
+									type={ navigationEntityType }
+								/>
 							) }
 						{ hasResolvedCanUserDeleteNavigationMenu &&
 							canUserDeleteNavigationMenu && (
 								<NavigationMenuDeleteControl
+									kind={ navigationEntityKind }
+									type={ navigationEntityType }
 									onDelete={ ( deletedMenuTitle = '' ) => {
 										replaceInnerBlocks( clientId, [] );
 										showNavigationMenuStatusNotice(
@@ -912,6 +937,8 @@ function Navigation( {
 							{ isEntityAvailable && (
 								<NavigationInnerBlocks
 									clientId={ clientId }
+									kind={ navigationEntityKind }
+									type={ navigationEntityType }
 									hasCustomPlaceholder={
 										!! CustomPlaceholder
 									}
