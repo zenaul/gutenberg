@@ -11,6 +11,7 @@ import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { ToolbarGroup } from '@wordpress/components';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -38,6 +39,7 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 		isValid,
 		isVisual,
 		isContentLocked,
+		showIconLabels,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -70,6 +72,10 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 			),
 			isContentLocked: !! __unstableGetContentLockingParent(
 				selectedBlockClientId
+			),
+			showIconLabels: select( preferencesStore ).get(
+				'core/edit-post',
+				'showIconLabels'
 			),
 		};
 	}, [] );
@@ -124,7 +130,10 @@ const BlockToolbar = ( { hideDragHandle } ) => {
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
 					! isContentLocked && (
 						<ToolbarGroup className="block-editor-block-toolbar__block-controls">
-							<BlockSwitcher clientIds={ blockClientIds } />
+							<BlockSwitcher
+								clientIds={ blockClientIds }
+								showIconLabels={ showIconLabels }
+							/>
 							{ ! isMultiToolbar && (
 								<BlockLockToolbar
 									clientId={ blockClientIds[ 0 ] }
