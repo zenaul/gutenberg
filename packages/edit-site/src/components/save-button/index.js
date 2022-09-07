@@ -10,6 +10,7 @@ import { useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { displayShortcut } from '@wordpress/keycodes';
 
 export default function SaveButton( {
 	openEntitiesSavedStates,
@@ -29,6 +30,8 @@ export default function SaveButton( {
 
 	const disabled = ! isDirty || isSaving;
 
+	const label = __( 'Save' );
+
 	return (
 		<Button
 			variant="primary"
@@ -37,8 +40,10 @@ export default function SaveButton( {
 			aria-expanded={ isEntitiesSavedStatesOpen }
 			isBusy={ isSaving }
 			onClick={ disabled ? undefined : openEntitiesSavedStates }
+			label={ label }
+			shortcut={ disabled ? undefined : displayShortcut.primary( 's' ) }
 		>
-			{ __( 'Save' ) }
+			{ label }
 		</Button>
 	);
 }
