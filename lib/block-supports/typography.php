@@ -159,7 +159,9 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 
 /**
  * Note: this method is for backwards compatibility.
- * It mostly replaces `gutenberg_typography_get_css_variable_inline_style()`.
+ * It is necessary to parse older blocks whose typography styles contain presets. See: WordPress/gutenberg#27555.
+ * It mostly replaces the deprecated `wp_typography_get_css_variable_inline_style()`,
+ * but skips compiling a CSS declaration as the style engine takes over this role.
  *
  * Generates an inline style value for a typography feature e.g. text decoration,
  * text transform, and font style.
@@ -176,7 +178,7 @@ function gutenberg_typography_get_preset_inline_style_value( $style_value, $css_
 	}
 
 	// For backwards compatibility.
-	// Presets were removed in https://github.com/WordPress/gutenberg/pull/27555.
+	// Presets were removed in WordPress/gutenberg#27555.
 	// We have a preset CSS variable as the style.
 	// Get the style value from the string and return CSS style.
 	$index_to_splice = strrpos( $style_value, '|' ) + 1;
@@ -184,42 +186,6 @@ function gutenberg_typography_get_preset_inline_style_value( $style_value, $css_
 
 	// Return the actual CSS inline style value e.g. `var(--wp--preset--text-decoration--underline);`.
 	return sprintf( 'var(--wp--preset--%s--%s);', $css_property, $slug );
-}
-
-/**
- * Deprecated.
- * This method is no longer used and will have to be deprecated in Core.
- *
- * It can be deleted once migrated to the next WordPress version.
- *
- * Generates an inline style for a typography feature e.g. text decoration,
- * text transform, and font style.
- *
- * @param array  $attributes   Block's attributes.
- * @param string $feature      Key for the feature within the typography styles.
- * @param string $css_property Slug for the CSS property the inline style sets.
- *
- * @return string              CSS inline style.
- */
-function gutenberg_typography_get_css_variable_inline_style( $attributes, $feature, $css_property ) {
-	// Retrieve current attribute value or skip if not found.
-	$style_value = _wp_array_get( $attributes, array( 'style', 'typography', $feature ), false );
-	if ( ! $style_value ) {
-		return;
-	}
-
-	// If we don't have a preset CSS variable, we'll assume it's a regular CSS value.
-	if ( ! str_contains( $style_value, "var:preset|{$css_property}|" ) ) {
-		return sprintf( '%s:%s;', $css_property, $style_value );
-	}
-
-	// We have a preset CSS variable as the style.
-	// Get the style value from the string and return CSS style.
-	$index_to_splice = strrpos( $style_value, '|' ) + 1;
-	$slug            = substr( $style_value, $index_to_splice );
-
-	// Return the actual CSS inline style e.g. `text-decoration:var(--wp--preset--text-decoration--underline);`.
-	return sprintf( '%s:var(--wp--preset--%s--%s);', $css_property, $css_property, $slug );
 }
 
 /**
