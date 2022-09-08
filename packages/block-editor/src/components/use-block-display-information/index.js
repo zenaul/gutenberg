@@ -20,7 +20,7 @@ import { store as blockEditorStore } from '../../store';
  * @property {WPIcon}           icon        Block type icon.
  * @property {string}           description A detailed block type description.
  * @property {string}           anchor      HTML anchor.
- * @property {string|undefined} customName  Human-readable, user-provided custom name for the block.
+ * @property {string|undefined} name        Human-readable, user-provided custom name for the block.
  */
 
 /**
@@ -56,7 +56,7 @@ export default function useBlockDisplayInformation( clientId ) {
 				icon: blockType.icon,
 				description: blockType.description,
 				anchor: attributes?.anchor,
-				customName: attributes?.metadata?.name,
+				name: attributes?.metadata?.name,
 			};
 			if ( ! match ) return blockTypeInfo;
 
@@ -65,7 +65,7 @@ export default function useBlockDisplayInformation( clientId ) {
 				icon: match.icon || blockType.icon,
 				description: match.description || blockType.description,
 				anchor: attributes?.anchor,
-				customName: attributes?.metadata?.name,
+				name: attributes?.metadata?.name,
 			};
 		},
 		[ clientId ]

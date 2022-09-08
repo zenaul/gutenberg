@@ -113,15 +113,13 @@ function ListViewBlock( {
 		blockAriaLabel = isLocked
 			? sprintf(
 					// translators: %s: The title of the block. This string indicates a link to select the locked block.
-					__( '%1$s (%2$s) link (locked)' ),
-					blockInformation.customName,
-					blockInformation.title
+					__( '%s link (locked)' ),
+					blockInformation.name || blockInformation.title
 			  )
 			: sprintf(
 					// translators: %s: The title of the block. This string indicates a link to select the block.
-					__( '%1$s (%2$s) link' ),
-					blockInformation.customName,
-					blockInformation.title
+					__( '%s link' ),
+					blockInformation.name || blockInformation.title
 			  );
 	}
 
