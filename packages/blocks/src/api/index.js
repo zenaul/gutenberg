@@ -124,7 +124,6 @@ export {
 	getBlockTypes,
 	getBlockSupport,
 	hasBlockSupport,
-	__experimentalHasBlockMetadataSupport,
 	getBlockVariations,
 	isReusableBlock,
 	isTemplatePart,

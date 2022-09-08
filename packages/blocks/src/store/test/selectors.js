@@ -15,7 +15,6 @@ import {
 	isMatchingSearchTerm,
 	getCategories,
 	getActiveBlockVariation,
-	__experimentalHasBlockMetadataSupport as hasBlockMetadataSupport,
 } from '../selectors';
 
 const keyBlocksByName = ( blocks ) =>
@@ -25,7 +24,7 @@ const keyBlocksByName = ( blocks ) =>
 	);
 
 describe( 'selectors', () => {
-	describe( 'hasBlockMetadataSupport', () => {
+	describe( 'Block Metadata support', () => {
 		const blockName = 'block/name';
 		const getState = ( blocks ) => {
 			return deepFreeze( {
@@ -34,15 +33,15 @@ describe( 'selectors', () => {
 		};
 
 		it.each( [ [ false ], [ true ] ] )(
-			`returns default value when config entry not found and default set to %s`,
+			`returns default value when config entry not found and default value is set to %s`,
 			( defaultValue ) => {
 				const state = getState( [] );
 
 				expect(
-					hasBlockMetadataSupport(
+					getBlockSupport(
 						state,
 						blockName,
-						null,
+						'__experimentalMetadata',
 						defaultValue
 					)
 				).toBe( defaultValue );
@@ -59,7 +58,9 @@ describe( 'selectors', () => {
 				},
 			] );
 
-			expect( hasBlockMetadataSupport( state, blockName ) ).toBe( false );
+			expect(
+				getBlockSupport( state, blockName, '__experimentalMetadata' )
+			).toBe( false );
 		} );
 
 		it( 'returns true when metadata supports set to truthy', () => {
@@ -72,7 +73,9 @@ describe( 'selectors', () => {
 				},
 			] );
 
-			expect( hasBlockMetadataSupport( state, blockName ) ).toBe( true );
+			expect(
+				getBlockSupport( state, blockName, '__experimentalMetadata' )
+			).toBe( true );
 		} );
 
 		it( 'returns false when metadata supports feature set to falsy', () => {
@@ -88,9 +91,12 @@ describe( 'selectors', () => {
 				},
 			] );
 
-			expect( hasBlockMetadataSupport( state, blockName, 'name' ) ).toBe(
-				false
-			);
+			expect(
+				getBlockSupport( state, blockName, [
+					'__experimentalMetadata',
+					'name',
+				] )
+			).toBe( false );
 		} );
 
 		it( 'returns true when metadata supports feature set to true', () => {
@@ -106,9 +112,13 @@ describe( 'selectors', () => {
 				},
 			] );
 
-			expect( hasBlockMetadataSupport( state, blockName, 'name' ) ).toBe(
-				true
-			);
+			expect(
+				getBlockSupport(
+					state,
+					blockName,
+					'__experimentalMetadata.name'
+				)
+			).toBe( true );
 		} );
 	} );
 
