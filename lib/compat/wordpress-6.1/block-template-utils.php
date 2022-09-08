@@ -257,6 +257,8 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
  * @param string                   $post_type Post type e.g:page, post, product.
  * @param string                   $slug      Slug of the post e.g:a-story-about-shoes.
  * @param Gutenberg_Block_Template $template  Template whose description and title are going to be computed.
+ *
+ * @return boolean True if an post referenced was found and false otherwise.
  */
 function _gutenberg_build_title_and_description_for_single_post_type_block_template( $post_type, $slug, &$template ) {
 	$post_type_object = get_post_type_object( $post_type );
@@ -268,7 +270,13 @@ function _gutenberg_build_title_and_description_for_single_post_type_block_templ
 		)
 	);
 	if ( empty( $posts ) ) {
-		return;
+		$template->title = sprintf(
+			// translators: Represents the title of a user's custom template in the Site Editor referencing a deleted post, where %1$s is the singular name of a post type and %2$s is the slug of the deleted post, e.g. "Deleted: Page(hello)".
+			__( 'Deleted: %1$s(%2$s)', 'gutenberg' ),
+			$post_type_object->labels->singular_name,
+			$slug
+		);
+		return false;
 	}
 
 	$post_title = $posts[0]->post_title;
@@ -300,6 +308,7 @@ function _gutenberg_build_title_and_description_for_single_post_type_block_templ
 			$slug
 		);
 	}
+	return true;
 }
 
 /**
@@ -311,8 +320,12 @@ function _gutenberg_build_title_and_description_for_single_post_type_block_templ
  * @param string                   $taxonomy Idenfitier of the taxonomy e.g:category.
  * @param string                   $slug     Slug of the term e.g:shoes.
  * @param Gutenberg_Block_Template $template Template whose description and title are going to be computed.
+ *
+ * @return boolean True if an term referenced was found and false otherwise.
  */
 function _gutenberg_build_title_and_description_for_taxonomy_block_template( $taxonomy, $slug, &$template ) {
+	$taxonomy_object = get_taxonomy( $taxonomy );
+
 	$terms = get_terms(
 		array(
 			'taxonomy'   => $taxonomy,
@@ -320,13 +333,18 @@ function _gutenberg_build_title_and_description_for_taxonomy_block_template( $ta
 			'slug'       => $slug,
 		)
 	);
+
 	if ( empty( $terms ) ) {
-		return;
+		$template->title = sprintf(
+			// translators: Represents the title of a user's custom template in the Site Editor referencing a deleted taxonomy term, where %1$s is the singular name of a taxonomy and %2$s is the slug of the deleted term, e.g. "Deleted: Category(shoes)".
+			__( 'Deleted: %1$s(%2$s)', 'gutenberg' ),
+			$taxonomy_object->labels->singular_name,
+			$slug
+		);
+		return false;
 	}
 
 	$term_title = $terms[0]->name;
-
-	$taxonomy_object = get_taxonomy( $taxonomy );
 
 	$template->title = sprintf(
 		// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the singular name of a taxonomy and %2$s is the name of the term, e.g. "Category: shoes".
@@ -355,6 +373,7 @@ function _gutenberg_build_title_and_description_for_taxonomy_block_template( $ta
 			$slug
 		);
 	}
+	return true;
 }
 
 /**
@@ -414,8 +433,10 @@ function gutenberg_build_block_template_result_from_post( $post ) {
 			$template->area = $type_terms[0]->name;
 		}
 	}
+	// If it is a block template without description and without title or with title equal to the slug.
 	if ( 'wp_template' === $post->post_type && empty( $template->description ) && ( empty( $template->title ) || $template->title === $template->slug ) ) {
 		$matches = array();
+		// If it is a block template for a single author, page, post, tag, category, custom post type or custom taxonomy.
 		if ( preg_match( '/(author|page|single|tag|category|taxonomy)-(.+)/', $template->slug, $matches ) ) {
 			$type           = $matches[1];
 			$slug_remaining = $matches[2];
@@ -424,14 +445,20 @@ function gutenberg_build_block_template_result_from_post( $post ) {
 					$nice_name = $slug_remaining;
 					$users     = get_users(
 						array(
-							'capability'     => 'publish_posts',
+							'capability'     => 'edit_posts',
 							'search'         => $nice_name,
 							'search_columns' => array( 'user_nicename' ),
 							'fields'         => 'display_name',
 						)
 					);
 
-					if ( ! empty( $users ) ) {
+					if ( empty( $users ) ) {
+						$template->title = sprintf(
+							// translators: Represents the title of a user's custom template in the Site Editor referencing a deleted author, where %s is the author's nicename, e.g. "Deleted author: jane-doe".
+							__( 'Deleted author: %s', 'gutenberg' ),
+							$nice_name
+						);
+					} else {
 						$author_name = $users[0];
 
 						$template->title = sprintf(
@@ -447,7 +474,7 @@ function gutenberg_build_block_template_result_from_post( $post ) {
 
 						$users_with_same_name = get_users(
 							array(
-								'capability'     => 'publish_posts',
+								'capability'     => 'edit_posts',
 								'search'         => $author_name,
 								'search_columns' => array( 'display_name' ),
 								'fields'         => 'display_name',
@@ -467,12 +494,16 @@ function gutenberg_build_block_template_result_from_post( $post ) {
 					_gutenberg_build_title_and_description_for_single_post_type_block_template( 'page', $slug_remaining, $template );
 					break;
 				case 'single':
-					$single_matches = array();
-					$regex          = '/(' . implode( '|', array_values( get_post_types() ) ) . ')-(.+)/';
-					if ( preg_match( $regex, $slug_remaining, $single_matches ) ) {
-						$post_type = $single_matches[1];
-						$slug      = $single_matches[2];
-						_gutenberg_build_title_and_description_for_single_post_type_block_template( $post_type, $slug, $template );
+					$post_types = get_post_types();
+					foreach ( $post_types as $post_type ) {
+						$post_type_lenght = strlen( $post_type ) + 1;
+						if ( 0 === strncmp( $slug_remaining, $post_type . '-', $post_type_lenght ) ) {
+							$slug  = substr( $slug_remaining, $post_type_lenght, strlen( $slug_remaining ) );
+							$found = _gutenberg_build_title_and_description_for_single_post_type_block_template( $post_type, $slug, $template );
+							if ( $found ) {
+								break;
+							}
+						}
 					}
 					break;
 				case 'tag':
@@ -482,11 +513,16 @@ function gutenberg_build_block_template_result_from_post( $post ) {
 					_gutenberg_build_title_and_description_for_taxonomy_block_template( 'category', $slug_remaining, $template );
 					break;
 				case 'taxonomy':
-					$taxonomy_matches = array();
-					if ( preg_match( '/(' . implode( '|', array_values( get_taxonomies() ) ) . ')-(.+)/', $slug_remaining, $taxonomy_matches ) ) {
-						$taxonomy = $taxonomy_matches[1];
-						$slug     = $taxonomy_matches[2];
-						_gutenberg_build_title_and_description_for_taxonomy_block_template( $taxonomy, $slug, $template );
+					$taxonomies = get_taxonomies();
+					foreach ( $taxonomies as $taxonomy ) {
+						$taxonomy_lenght = strlen( $taxonomy ) + 1;
+						if ( 0 === strncmp( $slug_remaining, $taxonomy . '-', $taxonomy_lenght ) ) {
+							$slug  = substr( $slug_remaining, $taxonomy_lenght, strlen( $slug_remaining ) );
+							$found = _gutenberg_build_title_and_description_for_taxonomy_block_template( $taxonomy, $slug, $template );
+							if ( $found ) {
+								break;
+							}
+						}
 					}
 					break;
 			}
