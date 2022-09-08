@@ -79,73 +79,69 @@ const ListViewBlockInput = forwardRef(
 		const handleFocus = ( event ) => event.target.select();
 
 		return (
-			<>
-				<div
-					ref={ ref }
-					className={ classnames(
-						'block-editor-list-view-block-node',
-						'block-editor-list-view-block-input',
-						className
-					) }
+			<div
+				ref={ ref }
+				className={ classnames(
+					'block-editor-list-view-block-node',
+					'block-editor-list-view-block-input',
+					className
+				) }
+			>
+				<ListViewExpander onClick={ onToggleExpanded } />
+				<BlockIcon icon={ blockInformation?.icon } showColors />
+				<HStack
+					alignment="center"
+					className="block-editor-list-view-block-node__label-wrapper"
+					justify="flex-start"
+					spacing={ 1 }
 				>
-					<ListViewExpander onClick={ onToggleExpanded } />
-					<BlockIcon icon={ blockInformation?.icon } showColors />
-					<HStack
-						alignment="center"
-						className="block-editor-list-view-block-node__label-wrapper"
-						justify="flex-start"
-						spacing={ 1 }
-					>
-						<span className="block-editor-list-view-block-node__title">
-							<>
-								<InputControl
-									ref={ inputRef }
-									value={ inputValue }
-									label={ __( 'Edit block name' ) }
-									hideLabelFromVision
-									onChange={ ( nextValue ) => {
-										setInputValue( nextValue ?? '' );
-									} }
-									onBlur={ () => {
-										toggleLabelEditingMode( false );
+					<span className="block-editor-list-view-block-node__title">
+						<InputControl
+							ref={ inputRef }
+							value={ inputValue }
+							label={ __( 'Edit block name' ) }
+							hideLabelFromVision
+							onChange={ ( nextValue ) => {
+								setInputValue( nextValue ?? '' );
+							} }
+							onBlur={ () => {
+								toggleLabelEditingMode( false );
 
-										// Reset the input's local state to avoid
-										// stale values.
-										setInputValue( blockTitle );
-									} }
-									onKeyDown={ onKeyDownHandler }
-									aria-describedby={ inputDescriptionId }
-									// eslint-disable-next-line jsx-a11y/no-autofocus
-									autoFocus={ true }
-									onFocus={ handleFocus }
-								/>
-								<VisuallyHidden>
-									<p id={ inputDescriptionId }>
-										{ __(
-											'Press the ENTER key to submit or the ESCAPE key to cancel.'
-										) }
-									</p>
-								</VisuallyHidden>
-							</>
+								// Reset the input's local state to avoid
+								// stale values.
+								setInputValue( blockTitle );
+							} }
+							onKeyDown={ onKeyDownHandler }
+							aria-describedby={ inputDescriptionId }
+							// eslint-disable-next-line jsx-a11y/no-autofocus
+							autoFocus={ true }
+							onFocus={ handleFocus }
+						/>
+						<VisuallyHidden>
+							<p id={ inputDescriptionId }>
+								{ __(
+									'Press the ENTER key to submit or the ESCAPE key to cancel.'
+								) }
+							</p>
+						</VisuallyHidden>
+					</span>
+					{ blockInformation?.anchor && (
+						<span className="block-editor-list-view-block-node__anchor-wrapper">
+							<Truncate
+								className="block-editor-list-view-block-node__anchor"
+								ellipsizeMode="auto"
+							>
+								{ blockInformation.anchor }
+							</Truncate>
 						</span>
-						{ blockInformation?.anchor && (
-							<span className="block-editor-list-view-block-node__anchor-wrapper">
-								<Truncate
-									className="block-editor-list-view-block-node__anchor"
-									ellipsizeMode="auto"
-								>
-									{ blockInformation.anchor }
-								</Truncate>
-							</span>
-						) }
-						{ isLocked && (
-							<span className="block-editor-list-view-block-node__lock">
-								<Icon icon={ lock } />
-							</span>
-						) }
-					</HStack>
-				</div>
-			</>
+					) }
+					{ isLocked && (
+						<span className="block-editor-list-view-block-node__lock">
+							<Icon icon={ lock } />
+						</span>
+					) }
+				</HStack>
+			</div>
 		);
 	}
 );
