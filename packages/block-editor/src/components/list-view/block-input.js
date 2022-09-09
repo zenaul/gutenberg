@@ -76,8 +76,6 @@ const ListViewBlockInput = forwardRef(
 			}
 		};
 
-		const handleFocus = ( event ) => event.target.select();
-
 		return (
 			<div
 				ref={ ref }
@@ -113,9 +111,6 @@ const ListViewBlockInput = forwardRef(
 							} }
 							onKeyDown={ onKeyDownHandler }
 							aria-describedby={ inputDescriptionId }
-							// eslint-disable-next-line jsx-a11y/no-autofocus
-							autoFocus={ true }
-							onFocus={ handleFocus }
 						/>
 						<VisuallyHidden>
 							<p id={ inputDescriptionId }>
