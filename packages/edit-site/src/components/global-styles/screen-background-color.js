@@ -91,7 +91,11 @@ function ScreenBackgroundColor( { name } ) {
 				) }
 			/>
 			<ColorGradientControl
-				className="edit-site-screen-background-color__control"
+				className={
+					hasGradientColor
+						? 'edit-site-screen-gradient-color__control'
+						: 'edit-site-screen-background-color__control'
+				}
 				colors={ colorsPerOrigin }
 				gradients={ gradientsPerOrigin }
 				disableCustomColors={ ! areCustomSolidsEnabled }
