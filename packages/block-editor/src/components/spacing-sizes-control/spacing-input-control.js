@@ -63,7 +63,7 @@ export default function SpacingInputControl( {
 
 	const previousValue = usePrevious( value );
 	if (
-		isValueSpacingPreset( previousValue ) &&
+		previousValue !== value &&
 		! isValueSpacingPreset( value ) &&
 		showCustomValueControl !== true
 	) {
