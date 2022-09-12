@@ -317,7 +317,7 @@ function ListViewBlock( {
 							} }
 							disableOpenOnArrowDown
 							__experimentalSelectBlock={ updateSelection }
-							context={ 'list-view' }
+							__unstableDisplayLocation={ 'list-view' }
 						/>
 					) }
 				</TreeGridCell>
