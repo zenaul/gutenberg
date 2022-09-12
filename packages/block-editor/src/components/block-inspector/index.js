@@ -157,12 +157,9 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			selectedBlockClientId: _selectedBlockClientId,
 			selectedBlockName: _selectedBlockName,
 			blockType: _blockType,
-			topLevelLockedBlock:
-				getTemplateLock( _selectedBlockClientId ) === 'noContent'
-					? _selectedBlockClientId
-					: __unstableGetContentLockingParent(
-							_selectedBlockClientId
-					  ),
+			topLevelLockedBlock: __unstableGetContentLockingParent(
+				_selectedBlockClientId
+			),
 		};
 	}, [] );
 
