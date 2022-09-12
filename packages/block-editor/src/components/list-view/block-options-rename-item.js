@@ -14,7 +14,7 @@ import BlockSettingsMenuControls from '../block-settings-menu-controls';
 function BlockOptionsRenameItem( { clientId, onClick } ) {
 	return (
 		<BlockSettingsMenuControls>
-			{ ( { selectedClientIds, context } ) => {
+			{ ( { selectedClientIds, __unstableDisplayLocation } ) => {
 				// Only enabled for single selections.
 				const canRename =
 					selectedClientIds.length === 1 &&
@@ -26,7 +26,10 @@ function BlockOptionsRenameItem( { clientId, onClick } ) {
 				// the block from which the menu was triggered.
 				// - `Rename` only appears in the ListView options.
 				// - `Rename` only appears for blocks that support renaming.
-				if ( context !== 'list-view' || ! canRename ) {
+				if (
+					__unstableDisplayLocation !== 'list-view' ||
+					! canRename
+				) {
 					return null;
 				}
 

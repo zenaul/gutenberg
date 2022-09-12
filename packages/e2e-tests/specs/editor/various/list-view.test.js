@@ -349,6 +349,7 @@ describe( 'List view', () => {
 		await groupNode.click( { clickCount: 2 } );
 
 		// Rename the block.
+		await pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.type( 'New name for the Group' );
 		await page.keyboard.press( 'Enter' );
 
@@ -361,7 +362,7 @@ describe( 'List view', () => {
 		// https://github.com/WordPress/gutenberg/pull/42605#discussion_r956657757
 		expect(
 			await groupNode.$eval(
-				'.block-editor-list-view-block-select-button__title',
+				'.block-editor-list-view-block-node__title',
 				( node ) => node.innerText
 			)
 		).toBe( 'New name for the Group' );
@@ -383,6 +384,7 @@ describe( 'List view', () => {
 		// Remove to List view Group node options menu.
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Enter' );
 
 		// Move to "Rename" option.
@@ -397,6 +399,7 @@ describe( 'List view', () => {
 		await expect( listViewGroupBlockInput ).toHaveFocus();
 
 		// Rename the block.
+		await pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.type( 'New name for the Group' );
 		await page.keyboard.press( 'Enter' );
 
@@ -409,7 +412,7 @@ describe( 'List view', () => {
 		// https://github.com/WordPress/gutenberg/pull/42605#discussion_r956657757
 		expect(
 			await groupNode.$eval(
-				'.block-editor-list-view-block-select-button__title',
+				'.block-editor-list-view-block-node__title',
 				( node ) => node.innerText
 			)
 		).toBe( 'New name for the Group' );
