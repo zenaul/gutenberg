@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { forwardRef, useState } from '@wordpress/element';
-import { __experimentalHasBlockMetadataSupport as hasBlockMetadataSupport } from '@wordpress/blocks';
+import { getBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -79,10 +79,14 @@ const ListViewBlockContents = forwardRef(
 
 		const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-		const supportsBlockNaming = hasBlockMetadataSupport(
+		const metaDataSupport = getBlockSupport(
 			blockName,
-			'name',
+			'__experimentalMetadata',
 			false
+		);
+
+		const supportsBlockNaming = !! (
+			true === metaDataSupport || metaDataSupport?.name
 		);
 
 		const { isLocked } = useBlockLock( clientId );
