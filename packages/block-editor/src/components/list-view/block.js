@@ -113,12 +113,14 @@ function ListViewBlock( {
 		blockAriaLabel = isLocked
 			? sprintf(
 					// translators: %s: The title of the block. This string indicates a link to select the locked block.
-					__( '%s link (locked)' ),
+					__( '%1$s (%2$s) link (locked)' ),
+					blockInformation.customName,
 					blockInformation.title
 			  )
 			: sprintf(
 					// translators: %s: The title of the block. This string indicates a link to select the block.
-					__( '%s link' ),
+					__( '%1$s (%2$s) link' ),
+					blockInformation.customName,
 					blockInformation.title
 			  );
 	}
@@ -259,7 +261,7 @@ function ListViewBlock( {
 							preventAnnouncement={ preventAnnouncement }
 						/>
 						<div
-							className="block-editor-list-view-block-select-button__description"
+							className="block-editor-list-view-block-node__description"
 							id={ descriptionId }
 						>
 							{ blockPositionDescription }
@@ -317,6 +319,7 @@ function ListViewBlock( {
 							} }
 							disableOpenOnArrowDown
 							__experimentalSelectBlock={ updateSelection }
+							context={ 'list-view' }
 						/>
 					) }
 				</TreeGridCell>

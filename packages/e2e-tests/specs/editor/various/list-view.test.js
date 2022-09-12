@@ -8,6 +8,8 @@ import {
 	openListView,
 	pressKeyWithModifier,
 	pressKeyTimes,
+	transformBlockTo,
+	getListViewBlocks,
 } from '@wordpress/e2e-test-utils';
 
 async function dragAndDrop( draggableElement, targetElement, offsetY ) {
@@ -326,5 +328,90 @@ describe( 'List view', () => {
 			'button[aria-label="Options for Group block"]'
 		);
 		await expect( listViewGroupBlockRight ).toHaveFocus();
+	} );
+
+	it( 'should allow in place block renaming via double click shortcut', async () => {
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'First Paragraph' );
+
+		// Multiselect via keyboard.
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
+
+		await transformBlockTo( 'Group' );
+
+		// Open list view.
+		await pressKeyWithModifier( 'access', 'o' );
+
+		let groupNode = ( await getListViewBlocks( 'Group' ) )[ 0 ];
+
+		// Double click on node to activate edit mode.
+		await groupNode.click( { clickCount: 2 } );
+
+		// Rename the block.
+		await page.keyboard.type( 'New name for the Group' );
+		await page.keyboard.press( 'Enter' );
+
+		groupNode = (
+			await getListViewBlocks( 'New name for the Group' )
+		 )[ 0 ];
+
+		// Ideally groupNode could be directly evaluated for its `innerText` but Puppeteer doesn't support this.
+		// If in the future these tests are migrated to Playwright we should implement the ideas from:
+		// https://github.com/WordPress/gutenberg/pull/42605#discussion_r956657757
+		expect(
+			await groupNode.$eval(
+				'.block-editor-list-view-block-select-button__title',
+				( node ) => node.innerText
+			)
+		).toBe( 'New name for the Group' );
+	} );
+
+	it( 'should allow in place block renaming via keyboard', async () => {
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'First Paragraph' );
+
+		// Multiselect via keyboard.
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
+
+		await transformBlockTo( 'Group' );
+
+		// Open list view.
+		await pressKeyWithModifier( 'access', 'o' );
+
+		// Remove to List view Group node options menu.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Enter' );
+
+		// Move to "Rename" option.
+		await pressKeyTimes( 'ArrowDown', 6 );
+
+		// Select option.
+		await page.keyboard.press( 'Enter' );
+
+		const listViewGroupBlockInput = await page.waitForSelector(
+			'input[value="Group"]'
+		);
+		await expect( listViewGroupBlockInput ).toHaveFocus();
+
+		// Rename the block.
+		await page.keyboard.type( 'New name for the Group' );
+		await page.keyboard.press( 'Enter' );
+
+		const groupNode = (
+			await getListViewBlocks( 'New name for the Group' )
+		 )[ 0 ];
+
+		// Ideally groupNode could be directly evaluated for its `innerText` but Puppeteer doesn't support this.
+		// If in the future these tests are migrated to Playwright we should implement the ideas from:
+		// https://github.com/WordPress/gutenberg/pull/42605#discussion_r956657757
+		expect(
+			await groupNode.$eval(
+				'.block-editor-list-view-block-select-button__title',
+				( node ) => node.innerText
+			)
+		).toBe( 'New name for the Group' );
 	} );
 } );
