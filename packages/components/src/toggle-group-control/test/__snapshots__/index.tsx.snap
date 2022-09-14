@@ -142,6 +142,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
   width: 100%;
   z-index: 2;
   width: 30px;
+  height: 30px;
   padding-left: 0;
   padding-right: 0;
   color: #fff;
@@ -209,6 +210,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
   width: 100%;
   z-index: 2;
   width: 30px;
+  height: 30px;
   padding-left: 0;
   padding-right: 0;
 }
