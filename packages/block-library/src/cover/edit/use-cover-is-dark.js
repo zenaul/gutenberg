@@ -20,6 +20,17 @@ function retrieveFastAverageColor() {
  * useCoverIsDark is a hook that returns a boolean variable specifying if the cover
  * background is dark or not.
  *
+ * If opacity is lower than 50, the dominant color is the media color, so the
+ * average media color is used for the dark mode calculation.
+ *
+ * If opacity is greater than 50 the dominant color is the overlay color, so the
+ * overlay color is used for the dark mode calculation.
+ *
+ * Additionally, if a background image isn't present, the overlay color is used
+ * for the dark mode calculation since the parent/body background color would
+ * show through and we don't have access to the parent/body background color for
+ * the calculation.
+ *
  * @param {?string} url          Url of the media background.
  * @param {?number} dimRatio     Transparency of the overlay color. If an image and
  *                               color are set, dimRatio is used to decide what is used
@@ -37,25 +48,19 @@ export default function useCoverIsDark(
 	elementRef
 ) {
 	const [ isDark, setIsDark ] = useState( false );
+	const isMediaCalculation = dimRatio <= 50 && url;
 	useEffect( () => {
-		if ( dimRatio > 50 || ! url || ! elementRef.current ) {
-			// If opacity is greater than 50 the dominant color is the overlay
-			// color, so use the overlay color for the dark mode computation.
-			// Additionally, fall back to using the overlay color if a
-			// background image isn't present since we don't have access to the
-			// site background color for the calculations.
-			// If no overlay color exists the overlay color is black (isDark).
-			setIsDark( ! overlayColor || colord( overlayColor ).isDark() );
-		} else {
-			// If opacity is lower than 50 the dominant color is the media color,
-			// so use the average media color for the dark mode computation.
+		if ( isMediaCalculation && elementRef.current ) {
 			retrieveFastAverageColor().getColorAsync(
 				elementRef.current,
 				( color ) => {
 					setIsDark( color.isDark );
 				}
 			);
+		} else {
+			// If no overlay color exists the overlay color is black (isDark).
+			setIsDark( ! overlayColor || colord( overlayColor ).isDark() );
 		}
-	}, [ dimRatio > 50, ! url, overlayColor, elementRef.current, setIsDark ] );
+	}, [ isMediaCalculation, overlayColor, elementRef.current, setIsDark ] );
 	return isDark;
 }
