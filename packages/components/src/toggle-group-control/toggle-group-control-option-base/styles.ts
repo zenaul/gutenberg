@@ -78,6 +78,12 @@ const pressed = css`
 
 const deselectable = css`
 	color: ${ COLORS.gray[ 900 ] };
+
+	&:focus {
+		box-shadow: inset 0 0 0 1px ${ COLORS.white },
+			0 0 0 ${ CONFIG.borderWidthFocus } ${ COLORS.ui.theme };
+		outline: 2px solid transparent;
+	}
 `;
 
 export const ButtonContentView = styled.div`
