@@ -55,7 +55,7 @@ export const buttonView = css`
 	}
 `;
 
-export const buttonActive = css`
+export const buttonPressed = css`
 	color: ${ COLORS.white };
 	&:active {
 		background: transparent;
