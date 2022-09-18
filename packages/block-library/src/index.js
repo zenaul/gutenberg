@@ -82,6 +82,7 @@ import * as postFeaturedImage from './post-featured-image';
 import * as postNavigationLink from './post-navigation-link';
 import * as postTemplate from './post-template';
 import * as postTerms from './post-terms';
+import * as postTimeToRead from './post-time-to-read';
 import * as postTitle from './post-title';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
@@ -195,6 +196,7 @@ const getAllBlocks = () =>
 		postTerms,
 		postNavigationLink,
 		postTemplate,
+		postTimeToRead,
 		queryPagination,
 		queryPaginationNext,
 		queryPaginationNumbers,
