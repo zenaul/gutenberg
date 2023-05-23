@@ -5,7 +5,8 @@ const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
 const { v4: uuid } = require( 'uuid' );
-const snapshotDiff = require( 'snapshot-diff' );
+
+/** @typedef {import('@playwright/test').Page} Page */
 
 /**
  * WordPress dependencies
@@ -218,8 +219,8 @@ test.describe( 'Image', () => {
 
 		// Add caption and navigate to inline toolbar.
 		await editor.clickBlockToolbarButton( 'Add caption' );
-		await pageUtils.pressKeyWithModifier( 'shift', 'Tab' );
-		await expect(
+		await pageUtils.pressKeys( 'shift+Tab' );
+		expect(
 			await page.evaluate( () =>
 				document.activeElement.getAttribute( 'aria-label' )
 			)
@@ -233,7 +234,7 @@ test.describe( 'Image', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 		// Italic to bold.
 		await page.keyboard.press( 'ArrowLeft' );
-		await expect(
+		expect(
 			await page.evaluate( () =>
 				document.activeElement.getAttribute( 'aria-label' )
 			)
@@ -312,7 +313,12 @@ test.describe( 'Image', () => {
 
 		// Assert that the image is initially unscaled and unedited.
 		const initialImageSrc = await image.getAttribute( 'src' );
-		const initialImageDataURL = await imageBlockUtils.getDataURL( image );
+		await expect
+			.poll( () => image.boundingBox() )
+			.toMatchObject( {
+				height: 10,
+				width: 10,
+			} );
 
 		// Zoom in to twice the amount using the zoom input.
 		await editor.clickBlockToolbarButton( 'Crop' );
@@ -321,12 +327,12 @@ test.describe( 'Image', () => {
 			page.locator( 'role=slider[name="Zoom"i]' )
 		).toBeFocused();
 
-		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'Tab' );
 		await expect(
 			page.locator( 'role=spinbutton[name="Zoom"i]' )
 		).toBeFocused();
 
-		await pageUtils.pressKeyWithModifier( 'primary', 'a' );
+		await pageUtils.pressKeys( 'primary+a' );
 		await page.keyboard.type( '200' );
 		await page.keyboard.press( 'Escape' );
 		await editor.clickBlockToolbarButton( 'Apply' );
@@ -340,11 +346,15 @@ test.describe( 'Image', () => {
 		const updatedImageSrc = await image.getAttribute( 'src' );
 		expect( initialImageSrc ).not.toEqual( updatedImageSrc );
 
-		const updatedImageDataURL = await imageBlockUtils.getDataURL( image );
-		expect( initialImageDataURL ).not.toEqual( updatedImageDataURL );
+		await expect
+			.poll( () => image.boundingBox() )
+			.toMatchObject( {
+				height: 5,
+				width: 5,
+			} );
 
 		expect(
-			snapshotDiff( initialImageDataURL, updatedImageDataURL )
+			await imageBlockUtils.getImageBuffer( updatedImageSrc )
 		).toMatchSnapshot();
 	} );
 
@@ -369,7 +379,12 @@ test.describe( 'Image', () => {
 
 		// Assert that the image is initially unscaled and unedited.
 		const initialImageSrc = await image.getAttribute( 'src' );
-		const initialImageDataURL = await imageBlockUtils.getDataURL( image );
+		await expect
+			.poll( () => image.boundingBox() )
+			.toMatchObject( {
+				height: 10,
+				width: 10,
+			} );
 
 		// Zoom in to twice the amount using the zoom input.
 		await editor.clickBlockToolbarButton( 'Crop' );
@@ -386,13 +401,17 @@ test.describe( 'Image', () => {
 
 		// Assert that the image is edited.
 		const updatedImageSrc = await image.getAttribute( 'src' );
-		const updatedImageDataURL = await imageBlockUtils.getDataURL( image );
+		expect( updatedImageSrc ).not.toEqual( initialImageSrc );
 
-		expect( initialImageSrc ).not.toEqual( updatedImageSrc );
-		expect( initialImageDataURL ).not.toEqual( updatedImageDataURL );
+		await expect
+			.poll( () => image.boundingBox() )
+			.toMatchObject( {
+				height: 6,
+				width: 10,
+			} );
 
 		expect(
-			snapshotDiff( initialImageDataURL, updatedImageDataURL )
+			await imageBlockUtils.getImageBuffer( updatedImageSrc )
 		).toMatchSnapshot();
 	} );
 
@@ -415,9 +434,6 @@ test.describe( 'Image', () => {
 
 		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
 
-		// Assert that the image is initially unscaled and unedited.
-		const initialImageDataURL = await imageBlockUtils.getDataURL( image );
-
 		// Rotate the image.
 		await editor.clickBlockToolbarButton( 'Crop' );
 		await editor.clickBlockToolbarButton( 'Rotate' );
@@ -429,14 +445,10 @@ test.describe( 'Image', () => {
 		).toBeHidden();
 
 		// Assert that the image is edited.
-		await expect
-			.poll( async () => imageBlockUtils.getDataURL( image ) )
-			.not.toBe( initialImageDataURL );
-
-		const updatedImageDataURL = await imageBlockUtils.getDataURL( image );
+		const updatedImageSrc = await image.getAttribute( 'src' );
 
 		expect(
-			snapshotDiff( initialImageDataURL, updatedImageDataURL )
+			await imageBlockUtils.getImageBuffer( updatedImageSrc )
 		).toMatchSnapshot();
 	} );
 
@@ -486,7 +498,7 @@ test.describe( 'Image', () => {
 			await page.click( 'role=button[name="Edit"i]' );
 			// Replace the url.
 			await page.fill( 'role=combobox[name="URL"i]', imageUrl );
-			await page.click( 'role=button[name="Submit"i]' );
+			await page.click( 'role=button[name="Apply"i]' );
 
 			const regex = new RegExp(
 				`<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
@@ -518,7 +530,7 @@ test.describe( 'Image', () => {
 
 		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
 		await page.focus( '.wp-block-image' );
-		await pageUtils.pressKeyWithModifier( 'primary', 'z' );
+		await pageUtils.pressKeys( 'primary+z' );
 
 		// Expect an empty image block (placeholder) rather than one with a
 		// broken temporary URL.
@@ -526,10 +538,200 @@ test.describe( 'Image', () => {
 <figure class="wp-block-image"><img alt=""/></figure>
 <!-- /wp:image -->` );
 	} );
+
+	test( 'can be replaced by dragging-and-dropping images from the inserter', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = page.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+		const blockLibrary = page.getByRole( 'region', {
+			name: 'Block Library',
+		} );
+
+		async function openMediaTab() {
+			const blockInserter = page.getByRole( 'button', {
+				name: 'Toggle block inserter',
+			} );
+			const isClosed =
+				( await blockInserter.getAttribute( 'aria-pressed' ) ) ===
+				'false';
+
+			if ( isClosed ) {
+				await blockInserter.click();
+			}
+
+			await blockLibrary.getByRole( 'tab', { name: 'Media' } ).click();
+
+			await blockLibrary
+				.getByRole( 'tabpanel', { name: 'Media' } )
+				.getByRole( 'button', { name: 'Openverse' } )
+				.click();
+		}
+
+		await openMediaTab();
+
+		// Drag the first image from the media library into the image block.
+		await blockLibrary
+			.getByRole( 'listbox', { name: 'Media List' } )
+			.getByRole( 'option' )
+			.first()
+			.dragTo( imageBlock );
+
+		await expect( async () => {
+			const blocks = await editor.getBlocks();
+			expect( blocks ).toHaveLength( 1 );
+
+			const [
+				{
+					attributes: { url },
+				},
+			] = blocks;
+			expect(
+				await imageBlock.getByRole( 'img' ).getAttribute( 'src' )
+			).toBe( url );
+			expect(
+				new URL( url ).host,
+				'should be updated to the media library'
+			).toBe( new URL( page.url() ).host );
+		}, 'should update the image from the media inserter' ).toPass();
+		const [
+			{
+				attributes: { url: firstUrl },
+			},
+		] = await editor.getBlocks();
+
+		await openMediaTab();
+
+		// Drag the second image from the media library into the image block.
+		await blockLibrary
+			.getByRole( 'listbox', { name: 'Media List' } )
+			.getByRole( 'option' )
+			.nth( 1 )
+			.dragTo( imageBlock );
+
+		await expect( async () => {
+			const blocks = await editor.getBlocks();
+			expect( blocks ).toHaveLength( 1 );
+
+			const [
+				{
+					attributes: { url },
+				},
+			] = blocks;
+			expect( url ).not.toBe( firstUrl );
+			expect(
+				await imageBlock.getByRole( 'img' ).getAttribute( 'src' )
+			).toBe( url );
+			expect(
+				new URL( url ).host,
+				'should be updated to the media library'
+			).toBe( new URL( page.url() ).host );
+		}, 'should replace the original image with the second image' ).toPass();
+	} );
+
+	test( 'should allow dragging and dropping HTML to media placeholder', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = page.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+
+		const html = `
+			<figure>
+				<img src="https://live.staticflickr.com/3894/14962688165_04759a8b03_b.jpg" alt="Cat">
+				<figcaption>"Cat" by tomhouslay is licensed under <a href="https://creativecommons.org/licenses/by-nc/2.0/?ref=openverse">CC BY-NC 2.0</a>.</figcaption>
+			</figure>
+		`;
+
+		await page.evaluate( ( _html ) => {
+			const dummy = document.createElement( 'div' );
+			dummy.style.width = '10px';
+			dummy.style.height = '10px';
+			dummy.style.zIndex = 99999;
+			dummy.style.position = 'fixed';
+			dummy.style.top = 0;
+			dummy.style.left = 0;
+			dummy.draggable = 'true';
+			dummy.addEventListener( 'dragstart', ( event ) => {
+				event.dataTransfer.setData( 'text/html', _html );
+				setTimeout( () => {
+					dummy.remove();
+				}, 0 );
+			} );
+			document.body.appendChild( dummy );
+		}, html );
+
+		await page.mouse.move( 0, 0 );
+		await page.mouse.down();
+		await imageBlock.hover();
+		await page.mouse.up();
+
+		const host = new URL( page.url() ).host;
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/image',
+				attributes: {
+					link: expect.stringContaining( host ),
+					url: expect.stringContaining( host ),
+					id: expect.any( Number ),
+					alt: 'Cat',
+					caption: `"Cat" by tomhouslay is licensed under <a href="https://creativecommons.org/licenses/by-nc/2.0/?ref=openverse">CC BY-NC 2.0</a>.`,
+				},
+			},
+		] );
+		const url = ( await editor.getBlocks() )[ 0 ].attributes.url;
+		await expect( imageBlock.getByRole( 'img' ) ).toHaveAttribute(
+			'src',
+			url
+		);
+	} );
+
+	test( 'should appear in the frontend published post content', async ( {
+		editor,
+		imageBlockUtils,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = page.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		const filename = await imageBlockUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' )
+		);
+
+		const imageInEditor = imageBlock.locator( 'role=img' );
+		await expect( imageInEditor ).toBeVisible();
+		await expect( imageInEditor ).toHaveAttribute(
+			'src',
+			new RegExp( filename )
+		);
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const figureDom = page.getByRole( 'figure' );
+		await expect( figureDom ).toBeVisible();
+
+		const imageDom = figureDom.locator( 'img' );
+		await expect( imageDom ).toBeVisible();
+		await expect( imageDom ).toHaveAttribute(
+			'src',
+			new RegExp( filename )
+		);
+	} );
 } );
 
 class ImageBlockUtils {
 	constructor( { page } ) {
+		/** @type {Page} */
 		this.page = page;
 
 		this.TEST_IMAGE_FILE_PATH = path.join(
@@ -555,14 +757,40 @@ class ImageBlockUtils {
 		return filename;
 	}
 
-	async getDataURL( element ) {
+	async getImageBuffer( url ) {
+		const response = await this.page.request.get( url );
+		return await response.body();
+	}
+
+	async getHexString( element ) {
 		return element.evaluate( ( node ) => {
 			const canvas = document.createElement( 'canvas' );
-			const context = canvas.getContext( '2d' );
 			canvas.width = node.width;
 			canvas.height = node.height;
+
+			const context = canvas.getContext( '2d' );
 			context.drawImage( node, 0, 0 );
-			return canvas.toDataURL( 'image/jpeg' );
+			const imageData = context.getImageData(
+				0,
+				0,
+				canvas.width,
+				canvas.height
+			);
+			const pixels = imageData.data;
+
+			let hexString = '';
+			for ( let i = 0; i < pixels.length; i += 4 ) {
+				if ( i !== 0 && i % ( canvas.width * 4 ) === 0 ) {
+					hexString += '\n';
+				}
+
+				const r = pixels[ i ].toString( 16 ).padStart( 2, '0' );
+				const g = pixels[ i + 1 ].toString( 16 ).padStart( 2, '0' );
+				const b = pixels[ i + 2 ].toString( 16 ).padStart( 2, '0' );
+				const a = pixels[ i + 3 ].toString( 16 ).padStart( 2, '0' );
+				hexString += '#' + r + g + b + a;
+			}
+			return hexString;
 		} );
 	}
 }

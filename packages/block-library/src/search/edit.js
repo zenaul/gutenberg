@@ -114,11 +114,16 @@ export default function SearchEdit( {
 	}
 
 	const colorProps = useColorProps( attributes );
-	const fluidTypographyEnabled = useSetting( 'typography.fluid' );
-	const typographyProps = useTypographyProps(
-		attributes,
-		fluidTypographyEnabled
-	);
+	const fluidTypographySettings = useSetting( 'typography.fluid' );
+	const layout = useSetting( 'layout' );
+	const typographyProps = useTypographyProps( attributes, {
+		typography: {
+			fluid: fluidTypographySettings,
+		},
+		layout: {
+			wideSize: layout?.wideSize,
+		},
+	} );
 	const unitControlInstanceId = useInstanceId( UnitControl );
 	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
 	const isButtonPositionInside = 'button-inside' === buttonPosition;

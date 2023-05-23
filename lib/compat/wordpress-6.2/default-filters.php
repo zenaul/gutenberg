@@ -18,10 +18,16 @@
  */
 
 /**
- * Note for backport: we should also remove the existing filters:
+ * This is a temporary fix to ensure that the block editor styles are enqueued
+ * in the order the iframe expects.
  *
- * > add_action( 'switch_theme', array( 'WP_Theme_JSON_Resolver', 'clean_cached_data' ) );
- * > add_action( 'start_previewing_theme', array( 'WP_Theme_JSON_Resolver', 'clean_cached_data' ) );
+ * The wp_enqueue_registered_block_scripts_and_styles callback has been removed in core
+ * as of https://github.com/WordPress/wordpress-develop/pull/4356.
+ *
+ * However, Gutenberg supports WordPress 6.1 and 6.2, which still have this callback.
+ * Hence, why we remove it first and then re-add it.
+ *
+ * This way we make sure it still works the same in WordPress trunk, 6.1 and 6.2.
  */
-add_action( 'switch_theme', 'wp_theme_clean_theme_json_cached_data' );
-add_action( 'start_previewing_theme', 'wp_theme_clean_theme_json_cached_data' );
+remove_action( 'enqueue_block_editor_assets', 'wp_enqueue_registered_block_scripts_and_styles' );
+add_action( 'enqueue_block_editor_assets', 'wp_enqueue_registered_block_scripts_and_styles', 1 );

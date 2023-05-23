@@ -14,8 +14,6 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import { store as editSiteStore } from '..';
 
-jest.useRealTimers();
-
 const ENTITY_TYPES = {
 	wp_template: {
 		description: 'Templates to include in your theme.',
@@ -81,7 +79,7 @@ describe( 'actions', () => {
 
 			const select = registry.select( editSiteStore );
 			expect( select.getEditedPostId() ).toBe( ID );
-			expect( select.getPage().context.templateSlug ).toBe( SLUG );
+			expect( select.getEditedPostContext().templateSlug ).toBe( SLUG );
 		} );
 
 		it( 'should set the template by fetching the template slug', async () => {
@@ -109,7 +107,7 @@ describe( 'actions', () => {
 
 			const select = registry.select( editSiteStore );
 			expect( select.getEditedPostId() ).toBe( ID );
-			expect( select.getPage().context.templateSlug ).toBe( SLUG );
+			expect( select.getEditedPostContext().templateSlug ).toBe( SLUG );
 		} );
 	} );
 
@@ -146,7 +144,7 @@ describe( 'actions', () => {
 
 			const select = registry.select( editSiteStore );
 			expect( select.getEditedPostId() ).toBe( ID );
-			expect( select.getPage().context.templateSlug ).toBe( SLUG );
+			expect( select.getEditedPostContext().templateSlug ).toBe( SLUG );
 		} );
 	} );
 
@@ -170,21 +168,13 @@ describe( 'actions', () => {
 			const ID = 'emptytheme//single';
 			const SLUG = 'single';
 
-			window.fetch = async ( path ) => {
-				if ( path === '/?_wp-find-template=true' ) {
-					return {
-						json: async () => ( { data: { id: ID, slug: SLUG } } ),
-					};
-				}
-
-				throw {
-					code: 'unknown_path',
-					message: `Unknown path: ${ path }`,
-				};
-			};
-
 			apiFetch.setFetchHandler( async ( options ) => {
-				const { method = 'GET', path } = options;
+				const { method = 'GET', path, url } = options;
+
+				// Called with url arg in `__experimentalGetTemplateForLink`
+				if ( url ) {
+					return { data: { id: ID, slug: SLUG } };
+				}
 
 				if ( method === 'GET' ) {
 					if ( path.startsWith( '/wp/v2/types' ) ) {
@@ -207,18 +197,6 @@ describe( 'actions', () => {
 			const select = registry.select( editSiteStore );
 			expect( select.getEditedPostId() ).toBe( 'emptytheme//single' );
 			expect( select.getEditedPostType() ).toBe( 'wp_template' );
-			expect( select.getPage().path ).toBe( '/' );
-		} );
-	} );
-
-	describe( 'setHomeTemplateId', () => {
-		it( 'should set the home template ID', () => {
-			const registry = createRegistryWithStores();
-
-			registry.dispatch( editSiteStore ).setHomeTemplateId( 90 );
-			expect( registry.select( editSiteStore ).getHomeTemplateId() ).toBe(
-				90
-			);
 		} );
 	} );
 

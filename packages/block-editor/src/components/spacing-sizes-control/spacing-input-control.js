@@ -20,6 +20,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
+import { usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -70,6 +71,16 @@ export default function SpacingInputControl( {
 			value !== undefined &&
 			! isValueSpacingPreset( value )
 	);
+
+	const previousValue = usePrevious( value );
+	if (
+		!! value &&
+		previousValue !== value &&
+		! isValueSpacingPreset( value ) &&
+		showCustomValueControl !== true
+	) {
+		setShowCustomValueControl( true );
+	}
 
 	const units = useCustomUnits( {
 		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
@@ -222,6 +233,8 @@ export default function SpacingInputControl( {
 					<UnitControl
 						onMouseOver={ onMouseOver }
 						onMouseOut={ onMouseOut }
+						onFocus={ onMouseOver }
+						onBlur={ onMouseOut }
 						onChange={ ( newSize ) =>
 							onChange( getNewCustomValue( newSize ) )
 						}
@@ -239,6 +252,8 @@ export default function SpacingInputControl( {
 					<RangeControl
 						onMouseOver={ onMouseOver }
 						onMouseOut={ onMouseOut }
+						onFocus={ onMouseOver }
+						onBlur={ onMouseOut }
 						value={ customRangeValue }
 						min={ 0 }
 						max={ CUSTOM_VALUE_SETTINGS[ selectedUnit ]?.max ?? 10 }
@@ -248,6 +263,7 @@ export default function SpacingInputControl( {
 						withInputField={ false }
 						onChange={ handleCustomValueSliderChange }
 						className="components-spacing-sizes-control__custom-value-range"
+						__nextHasNoMarginBottom
 					/>
 				</>
 			) }
@@ -277,6 +293,8 @@ export default function SpacingInputControl( {
 					label={ ariaLabel }
 					hideLabelFromVision={ true }
 					__nextHasNoMarginBottom={ true }
+					onFocus={ onMouseOver }
+					onBlur={ onMouseOut }
 				/>
 			) }
 			{ ! showRangeControl && ! showCustomValueControl && (
@@ -302,6 +320,8 @@ export default function SpacingInputControl( {
 					size={ '__unstable-large' }
 					onMouseOver={ onMouseOver }
 					onMouseOut={ onMouseOut }
+					onFocus={ onMouseOver }
+					onBlur={ onMouseOut }
 				/>
 			) }
 		</>

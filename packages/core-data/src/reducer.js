@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, groupBy, isEqual, get } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -67,10 +67,7 @@ export function users( state = { byId: {}, queries: {} }, action ) {
 				},
 				queries: {
 					...state.queries,
-					[ action.queryID ]: map(
-						action.users,
-						( user ) => user.id
-					),
+					[ action.queryID ]: action.users.map( ( user ) => user.id ),
 				},
 			};
 	}
@@ -245,18 +242,14 @@ function entity( entityConfig ) {
 										// Edits are the "raw" attribute values, but records may have
 										// objects with more properties, so we use `get` here for the
 										// comparison.
-										! isEqual(
+										! fastDeepEqual(
 											edits[ key ],
-											get(
-												record[ key ],
-												'raw',
-												record[ key ]
-											)
+											record[ key ]?.raw ?? record[ key ]
 										) &&
 										// Sometimes the server alters the sent value which means
 										// we need to also remove the edits before the api request.
 										( ! action.persistedEdits ||
-											! isEqual(
+											! fastDeepEqual(
 												edits[ key ],
 												action.persistedEdits[ key ]
 											) )
@@ -368,7 +361,15 @@ export const entities = ( state = {}, action ) => {
 	// Generates a dynamic reducer for the entities.
 	let entitiesDataReducer = state.reducer;
 	if ( ! entitiesDataReducer || newConfig !== state.config ) {
-		const entitiesByKind = groupBy( newConfig, 'kind' );
+		const entitiesByKind = newConfig.reduce( ( acc, record ) => {
+			const { kind } = record;
+			if ( ! acc[ kind ] ) {
+				acc[ kind ] = [];
+			}
+			acc[ kind ].push( record );
+			return acc;
+		}, {} );
+
 		entitiesDataReducer = combineReducers(
 			Object.entries( entitiesByKind ).reduce(
 				( memo, [ kind, subEntities ] ) => {
@@ -641,6 +642,35 @@ export function blockPatternCategories( state = [], action ) {
 	return state;
 }
 
+export function navigationFallbackId( state = null, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_NAVIGATION_FALLBACK_ID':
+			return action.fallbackId;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer managing the theme global styles revisions.
+ *
+ * @param {Record<string, object>} state  Current state.
+ * @param {Object}                 action Dispatched action.
+ *
+ * @return {Record<string, object>} Updated state.
+ */
+export function themeGlobalStyleRevisions( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_THEME_GLOBAL_STYLE_REVISIONS':
+			return {
+				...state,
+				[ action.currentId ]: action.revisions,
+			};
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	terms,
 	users,
@@ -649,6 +679,7 @@ export default combineReducers( {
 	currentUser,
 	themeGlobalStyleVariations,
 	themeBaseGlobalStyles,
+	themeGlobalStyleRevisions,
 	taxonomies,
 	entities,
 	undo,
@@ -657,4 +688,5 @@ export default combineReducers( {
 	autosaves,
 	blockPatterns,
 	blockPatternCategories,
+	navigationFallbackId,
 } );

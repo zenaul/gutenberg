@@ -20,7 +20,6 @@ import { displayShortcut } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import PostSwitchToDraftButton from '../post-switch-to-draft-button';
 import { store as editorStore } from '../../store';
 
 /**
@@ -48,10 +47,8 @@ export default function PostSavedState( {
 		isDirty,
 		isNew,
 		isPending,
-		isPublished,
 		isSaveable,
 		isSaving,
-		isScheduled,
 		hasPublishAction,
 	} = useSelect(
 		( select ) => {
@@ -106,10 +103,6 @@ export default function PostSavedState( {
 		return null;
 	}
 
-	if ( isPublished || isScheduled ) {
-		return <PostSwitchToDraftButton />;
-	}
-
 	/* translators: button label text should, if possible, be under 16 characters. */
 	const label = isPending ? __( 'Save as pending' ) : __( 'Save draft' );
 
@@ -151,10 +144,22 @@ export default function PostSavedState( {
 					: undefined
 			}
 			onClick={ isDisabled ? undefined : () => savePost() }
-			shortcut={ displayShortcut.primary( 's' ) }
-			variant={ isLargeViewport ? 'tertiary' : undefined }
+			/*
+			 * We want the tooltip to show the keyboard shortcut only when the
+			 * button does something, i.e. when it's not disabled.
+			 */
+			shortcut={ isDisabled ? undefined : displayShortcut.primary( 's' ) }
+			/*
+			 * Displaying the keyboard shortcut conditionally makes the tooltip
+			 * itself show conditionally. This would trigger a full-rerendering
+			 * of the button that we want to avoid. By setting `showTooltip`,
+			 & the tooltip is always rendered even when there's no keyboard shortcut.
+			 */
+			showTooltip
+			variant="tertiary"
 			icon={ isLargeViewport ? undefined : cloudUpload }
-			label={ showIconLabels ? undefined : label }
+			// Make sure the aria-label has always a value, as the default `text` is undefined on small screens.
+			label={ text || label }
 			aria-disabled={ isDisabled }
 		>
 			{ isSavedState && <Icon icon={ isSaved ? check : cloud } /> }
