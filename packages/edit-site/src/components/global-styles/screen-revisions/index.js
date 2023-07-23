@@ -19,7 +19,7 @@ import {
  * Internal dependencies
  */
 import ScreenHeader from '../header';
-import { unlock } from '../../../private-apis';
+import { unlock } from '../../../lock-unlock';
 import Revisions from '../../revisions';
 import SidebarFixedBottom from '../../sidebar-edit-mode/sidebar-fixed-bottom';
 import { store as editSiteStore } from '../../../store';
@@ -70,6 +70,7 @@ function ScreenRevisions() {
 		setUserConfig( () => ( {
 			styles: revision?.styles,
 			settings: revision?.settings,
+			behaviors: revision?.behaviors,
 		} ) );
 		setIsLoadingRevisionWithUnsavedChanges( false );
 		onCloseRevisions();
@@ -79,6 +80,7 @@ function ScreenRevisions() {
 		setGlobalStylesRevision( {
 			styles: revision?.styles,
 			settings: revision?.settings,
+			behaviors: revision?.behaviors,
 			id: revision?.id,
 		} );
 		setSelectedRevisionId( revision?.id );

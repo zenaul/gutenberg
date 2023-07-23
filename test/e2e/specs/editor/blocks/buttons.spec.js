@@ -10,6 +10,9 @@ test.describe( 'Buttons', () => {
 
 	test( 'has focus on button content', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/buttons' } );
+		await expect(
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
+		).toBeFocused();
 		await page.keyboard.type( 'Content' );
 
 		// Check the content.
@@ -27,7 +30,7 @@ test.describe( 'Buttons', () => {
 		editor,
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas.click( 'role=button[name="Add default block"i]' );
 		await page.keyboard.type( '/buttons' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Content' );
@@ -50,13 +53,16 @@ test.describe( 'Buttons', () => {
 	} ) => {
 		// Regression: https://github.com/WordPress/gutenberg/pull/19885
 		await editor.insertBlock( { name: 'core/buttons' } );
+		await expect(
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
+		).toBeFocused();
 		await pageUtils.pressKeys( 'primary+k' );
 		await expect(
-			page.locator( 'role=combobox[name="URL"i]' )
+			page.locator( 'role=combobox[name="Link"i]' )
 		).toBeFocused();
 		await page.keyboard.press( 'Escape' );
 		await expect(
-			page.locator( 'role=textbox[name="Button text"i]' )
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
 		).toBeFocused();
 		await page.keyboard.type( 'WordPress' );
 
@@ -78,9 +84,12 @@ test.describe( 'Buttons', () => {
 	} ) => {
 		// Regression: https://github.com/WordPress/gutenberg/issues/34307
 		await editor.insertBlock( { name: 'core/buttons' } );
+		await expect(
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
+		).toBeFocused();
 		await pageUtils.pressKeys( 'primary+k' );
 		await expect(
-			page.locator( 'role=combobox[name="URL"i]' )
+			page.locator( 'role=combobox[name="Link"i]' )
 		).toBeFocused();
 		await page.keyboard.type( 'https://example.com' );
 		await page.keyboard.press( 'Enter' );
@@ -91,7 +100,7 @@ test.describe( 'Buttons', () => {
 
 		// Focus should move from the link control to the button block's text.
 		await expect(
-			page.locator( 'role=textbox[name="Button text"i]' )
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
 		).toBeFocused();
 
 		// The link control should still be visible when a URL is set.
@@ -107,9 +116,12 @@ test.describe( 'Buttons', () => {
 	} ) => {
 		// Regression: https://github.com/WordPress/gutenberg/issues/34307
 		await editor.insertBlock( { name: 'core/buttons' } );
+		await expect(
+			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
+		).toBeFocused();
 		await pageUtils.pressKeys( 'primary+k' );
 
-		const urlInput = page.locator( 'role=combobox[name="URL"i]' );
+		const urlInput = page.locator( 'role=combobox[name="Link"i]' );
 
 		await expect( urlInput ).toBeFocused();
 		await page.keyboard.type( 'example.com' );
@@ -194,8 +206,8 @@ test.describe( 'Buttons', () => {
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:buttons -->
-<div class=\"wp-block-buttons\"><!-- wp:button {\"backgroundColor\":\"vivid-red\",\"textColor\":\"cyan-bluish-gray\"} -->
-<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-cyan-bluish-gray-color has-vivid-red-background-color has-text-color has-background wp-element-button\">Content</a></div>
+<div class=\"wp-block-buttons\"><!-- wp:button {\"backgroundColor\":\"vivid-red\",\"textColor\":\"cyan-bluish-gray\",\"style\":{\"elements\":{\"link\":{\"color\":{\"text\":\"var:preset|color|cyan-bluish-gray\"}}}}} -->
+<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-cyan-bluish-gray-color has-vivid-red-background-color has-text-color has-background has-link-color wp-element-button\">Content</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`
 		);
@@ -226,8 +238,8 @@ test.describe( 'Buttons', () => {
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:buttons -->
-<div class=\"wp-block-buttons\"><!-- wp:button {\"style\":{\"color\":{\"text\":\"#ff0000\",\"background\":\"#00ff00\"}}} -->
-<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-text-color has-background wp-element-button\" style=\"color:#ff0000;background-color:#00ff00\">Content</a></div>
+<div class=\"wp-block-buttons\"><!-- wp:button {\"style\":{\"color\":{\"text\":\"#ff0000\",\"background\":\"#00ff00\"},\"elements\":{\"link\":{\"color\":{\"text\":\"#ff0000\"}}}}} -->
+<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-text-color has-background has-link-color wp-element-button\" style=\"color:#ff0000;background-color:#00ff00\">Content</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`
 		);
