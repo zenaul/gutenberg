@@ -28,6 +28,7 @@
 	}
 
 	// Unset some hovers, instead of adding :not specificity.
+	&:disabled:hover,
 	&[aria-disabled="true"]:hover {
 		color: initial;
 	}
@@ -128,8 +129,11 @@
 			background: transparent;
 			transform: none;
 			opacity: 1;
-			box-shadow: none;
-			outline: none;
+
+			&:not(:focus) {
+				box-shadow: none;
+				outline: none;
+			}
 		}
 	}
 
@@ -144,7 +148,7 @@
 		color: $components-color-accent;
 		background: transparent;
 
-		&:hover:not(:disabled) {
+		&:hover:not(:disabled, [aria-disabled="true"]) {
 			box-shadow: inset 0 0 0 $border-width $components-color-accent-darker-10;
 		}
 	}
@@ -160,11 +164,13 @@
 
 		&:hover:not(:disabled, [aria-disabled="true"]) {
 			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
+			/* stylelint-disable-next-line declaration-property-value-disallowed-list */
 			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 		}
 
 		&:active:not(:disabled, [aria-disabled="true"]) {
 			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
+			/* stylelint-disable-next-line declaration-property-value-disallowed-list */
 			background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
 		}
 
@@ -185,7 +191,6 @@
 		// Only the default variant is styled differently from the non-destructive counterparts.
 		&:not(.is-primary):not(.is-secondary):not(.is-tertiary):not(.is-link) {
 			color: $alert-red;
-			box-shadow: inset 0 0 0 $border-width $alert-red;
 
 			&:hover:not(:disabled) {
 				color: darken($alert-red, 20%);
@@ -242,6 +247,11 @@
 	&.is-secondary.is-busy:disabled,
 	&.is-secondary.is-busy[aria-disabled="true"] {
 		animation: components-button__busy-animation 2500ms infinite linear;
+		// This should be refactored to use the reduce-motion("animation") mixin
+		// as soon as https://github.com/WordPress/gutenberg/issues/55566 is closed.
+		@media (prefers-reduced-motion: reduce) {
+			animation-duration: 0s;
+		}
 		opacity: 1;
 		background-size: 100px 100%;
 		// Disable reason: This function call looks nicer when each argument is on its own line.

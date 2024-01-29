@@ -1,4 +1,16 @@
 /**
+ * External dependencies
+ */
+import {
+	ArgsTable,
+	Description,
+	Primary,
+	Stories,
+	Subtitle,
+	Title,
+} from '@storybook/blocks';
+
+/**
  * Internal dependencies
  */
 import { WithGlobalCSS } from './decorators/with-global-css';
@@ -87,8 +99,47 @@ export const decorators = [
 ];
 
 export const parameters = {
+	// For @geometricpanda/storybook-addon-badges
+	badgesConfig: {
+		private: {
+			title: '🔒 Private',
+			tooltip: {
+				title: 'Component is locked as a private API',
+				desc: 'We do not yet recommend using this outside of the Gutenberg codebase.',
+				links: [
+					{
+						title: 'About @wordpress/private-apis',
+						href: 'https://developer.wordpress.org/block-editor/reference-guides/packages/packages-private-apis/',
+					},
+				],
+			},
+		},
+		wip: {
+			title: '🚧 WIP',
+			styles: { backgroundColor: '#FFF0BD' },
+			tooltip: {
+				title: 'Component is a work in progress',
+				desc: 'This component is not ready for use in production, including the Gutenberg codebase. DO NOT export outside of @wordpress/components.',
+			},
+		},
+	},
 	controls: {
 		sort: 'requiredFirst',
+	},
+	docs: {
+		// Flips the order of the description and the primary component story
+		// so the component is always visible before the fold.
+		page: () => (
+			<>
+				<Title />
+				<Subtitle />
+				<Primary />
+				<Description />
+				{ /* `story="^"` enables Controls for the primary props table */ }
+				<ArgsTable story="^" />
+				<Stories includePrimary={ false } />
+			</>
+		),
 	},
 	options: {
 		storySort: {

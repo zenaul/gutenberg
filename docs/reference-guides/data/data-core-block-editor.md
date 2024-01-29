@@ -209,6 +209,35 @@ _Returns_
 
 -   `number`: Number of blocks in the post.
 
+### getBlockEditingMode
+
+Returns the block editing mode for a given block.
+
+The mode can be one of three options:
+
+-   `'disabled'`: Prevents editing the block entirely, i.e. it cannot be selected.
+-   `'contentOnly'`: Hides all non-content UI, e.g. auxiliary controls in the toolbar, the block movers, block settings.
+-   `'default'`: Allows editing the block as normal.
+
+Blocks can set a mode using the `useBlockEditingMode` hook.
+
+The mode is inherited by all of the block's inner blocks, unless they have their own mode.
+
+A template lock can also set a mode. If the template lock is `'contentOnly'`, the block's mode is overridden to `'contentOnly'` if the block has a content role attribute, or `'disabled'` otherwise.
+
+_Related_
+
+-   useBlockEditingMode
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _clientId_ `string`: The block client ID, or `''` for the root container.
+
+_Returns_
+
+-   `BlockEditingMode`: The block editing mode. One of `'disabled'`, `'contentOnly'`, or `'default'`.
+
 ### getBlockHierarchyRootClientId
 
 Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
@@ -380,6 +409,19 @@ _Returns_
 
 -   `WPBlock[]`: Block objects.
 
+### getBlocksByName
+
+Returns all blocks that match a blockName. Results include nested blocks.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _blockName_ `?string`: Optional block name, if not specified, returns an empty array.
+
+_Returns_
+
+-   `Array`: Array of clientIds of blocks with name equal to blockName.
+
 ### getBlockSelectionEnd
 
 Returns the current block selection end. This value may be null, and it may represent either a singular block selection or multi-selection end. A selection is singular if its start and end match.
@@ -444,11 +486,11 @@ Returns an array containing the clientIds of all descendants of the blocks given
 _Parameters_
 
 -   _state_ `Object`: Global application state.
--   _clientIds_ `Array`: Array of blocks to inspect.
+-   _clientIds_ `string|string[]`: Client ID(s) for which descendant blocks are to be returned.
 
 _Returns_
 
--   `Array`: ids of descendants.
+-   `Array`: Client IDs of descendants.
 
 ### getClientIdsWithDescendants
 
@@ -1048,6 +1090,19 @@ _Returns_
 
 -   `boolean`: Whether block is first in multi-selection.
 
+### isGroupable
+
+Indicates if the provided blocks(by client ids) are groupable. We need to have at least one block, have a grouping block name set and be able to remove these blocks.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _clientIds_ `string[]`: Block client ids. If not passed the selected blocks client ids will be used.
+
+_Returns_
+
+-   `boolean`: True if the blocks are groupable.
+
 ### isLastBlockChangePersistent
 
 Returns true if the most recent block change is be considered persistent, or false otherwise. A persistent change is one committed by BlockEditorProvider via its `onChange` callback, in addition to `onInput`.
@@ -1111,6 +1166,19 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether user is typing.
+
+### isUngroupable
+
+Indicates if a block is ungroupable. A block is ungroupable if it is a single grouping block with inner blocks. If a block has an `ungroup` transform, it is also ungroupable, without the requirement of being the default grouping block. Additionally a block can only be ungrouped if it has inner blocks and can be removed.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _clientId_ `string`: Client Id of the block. If not passed the selected block's client id will be used.
+
+_Returns_
+
+-   `boolean`: True if the block is ungroupable.
 
 ### isValidTemplate
 
@@ -1554,6 +1622,23 @@ _Parameters_
 -   _clientId_ `string`: Block client ID.
 -   _fallbackToParent_ `boolean`: If true, select the first parent if there is no previous block.
 
+### setBlockEditingMode
+
+Sets the block editing mode for a given block.
+
+_Related_
+
+-   useBlockEditingMode
+
+_Parameters_
+
+-   _clientId_ `string`: The block client ID, or `''` for the root container.
+-   _mode_ `BlockEditingMode`: The block editing mode. One of `'disabled'`, `'contentOnly'`, or `'default'`.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### setBlockMovingClientId
 
 Action that enables or disables the block moving mode.
@@ -1706,6 +1791,22 @@ Action that enables or disables block selection.
 _Parameters_
 
 -   _isSelectionEnabled_ `[boolean]`: Whether block selection should be enabled.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### unsetBlockEditingMode
+
+Clears the block editing mode for a given block.
+
+_Related_
+
+-   useBlockEditingMode
+
+_Parameters_
+
+-   _clientId_ `string`: The block client ID, or `''` for the root container.
 
 _Returns_
 

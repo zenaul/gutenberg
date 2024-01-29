@@ -5,17 +5,20 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { __, isRTL } from '@wordpress/i18n';
 import {
 	code,
-	cog,
 	drawerLeft,
 	drawerRight,
 	blockDefault,
-	keyboardClose,
-	desktop,
+	keyboard,
+	fullscreen,
 	listView,
+	external,
+	formatListBullets,
 } from '@wordpress/icons';
 import { useCommand } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as editorStore } from '@wordpress/editor';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -29,23 +32,44 @@ export default function useCommonCommands() {
 		openGeneralSidebar,
 		closeGeneralSidebar,
 		switchEditorMode,
-		setIsListViewOpened,
+		toggleDistractionFree,
 	} = useDispatch( editPostStore );
 	const { openModal } = useDispatch( interfaceStore );
-	const { editorMode, activeSidebar, isListViewOpen } = useSelect(
-		( select ) => {
-			const { getEditorMode, isListViewOpened } = select( editPostStore );
-			return {
-				activeSidebar: select(
-					interfaceStore
-				).getActiveComplementaryArea( editPostStore.name ),
-				editorMode: getEditorMode(),
-				isListViewOpen: isListViewOpened(),
-			};
-		},
-		[]
-	);
+	const {
+		editorMode,
+		activeSidebar,
+		isListViewOpen,
+		isFullscreen,
+		isPublishSidebarEnabled,
+		showBlockBreadcrumbs,
+		isDistractionFree,
+		isTopToolbar,
+		isFocusMode,
+	} = useSelect( ( select ) => {
+		const { get } = select( preferencesStore );
+		const { getEditorMode } = select( editPostStore );
+		const { isListViewOpened } = select( editorStore );
+
+		return {
+			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
+				editPostStore.name
+			),
+			editorMode: getEditorMode(),
+			isListViewOpen: isListViewOpened(),
+			isPublishSidebarEnabled:
+				select( editorStore ).isPublishSidebarEnabled(),
+			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
+			isDistractionFree: get( 'core', 'distractionFree' ),
+			isFocusMode: get( 'core', 'focusMode' ),
+			isTopToolbar: get( 'core', 'fixedToolbar' ),
+			isFullscreen: get( 'core/edit-post', 'fullscreenMode' ),
+		};
+	}, [] );
 	const { toggle } = useDispatch( preferencesStore );
+	const { createInfoNotice } = useDispatch( noticesStore );
+	const { __unstableSaveForPreview, setIsListViewOpened } =
+		useDispatch( editorStore );
+	const { getCurrentPostId } = useSelect( editorStore );
 
 	useCommand( {
 		name: 'core/open-settings-sidebar',
@@ -77,57 +101,120 @@ export default function useCommonCommands() {
 
 	useCommand( {
 		name: 'core/toggle-distraction-free',
-		label: __( 'Toggle distraction free' ),
-		icon: cog,
+		label: isDistractionFree
+			? __( 'Exit Distraction Free' )
+			: __( 'Enter Distraction Free ' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-post', 'distractionFree' );
+			toggleDistractionFree();
 			close();
 		},
 	} );
 
 	useCommand( {
 		name: 'core/toggle-spotlight-mode',
-		label: __( 'Toggle spotlight mode' ),
-		icon: cog,
+		label: __( 'Toggle spotlight' ),
 		callback: ( { close } ) => {
-			toggle( 'core/edit-post', 'focusMode' );
+			toggle( 'core', 'focusMode' );
 			close();
+			createInfoNotice(
+				isFocusMode ? __( 'Spotlight off.' ) : __( 'Spotlight on.' ),
+				{
+					id: 'core/edit-post/toggle-spotlight-mode/notice',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick: () => {
+								toggle( 'core', 'focusMode' );
+							},
+						},
+					],
+				}
+			);
 		},
 	} );
 
 	useCommand( {
 		name: 'core/toggle-fullscreen-mode',
-		label: __( 'Toggle fullscreen mode' ),
-		icon: desktop,
+		label: isFullscreen
+			? __( 'Exit fullscreen' )
+			: __( 'Enter fullscreen' ),
+		icon: fullscreen,
 		callback: ( { close } ) => {
 			toggle( 'core/edit-post', 'fullscreenMode' );
 			close();
+			createInfoNotice(
+				isFullscreen ? __( 'Fullscreen off.' ) : __( 'Fullscreen on.' ),
+				{
+					id: 'core/edit-post/toggle-fullscreen-mode/notice',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick: () => {
+								toggle( 'core/edit-post', 'fullscreenMode' );
+							},
+						},
+					],
+				}
+			);
 		},
 	} );
 
 	useCommand( {
 		name: 'core/toggle-list-view',
-		label: __( 'Toggle list view' ),
+		label: isListViewOpen
+			? __( 'Close List View' )
+			: __( 'Open List View' ),
 		icon: listView,
 		callback: ( { close } ) => {
 			setIsListViewOpened( ! isListViewOpen );
 			close();
+			createInfoNotice(
+				isListViewOpen ? __( 'List View off.' ) : __( 'List View on.' ),
+				{
+					id: 'core/edit-post/toggle-list-view/notice',
+					type: 'snackbar',
+				}
+			);
 		},
 	} );
 
 	useCommand( {
 		name: 'core/toggle-top-toolbar',
 		label: __( 'Toggle top toolbar' ),
-		icon: cog,
 		callback: ( { close } ) => {
-			toggle( 'core/edit-post', 'fixedToolbar' );
+			toggle( 'core', 'fixedToolbar' );
+			if ( isDistractionFree ) {
+				toggleDistractionFree();
+			}
 			close();
+			createInfoNotice(
+				isTopToolbar
+					? __( 'Top toolbar off.' )
+					: __( 'Top toolbar on.' ),
+				{
+					id: 'core/edit-post/toggle-top-toolbar/notice',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick: () => {
+								toggle( 'core', 'fixedToolbar' );
+							},
+						},
+					],
+				}
+			);
 		},
 	} );
 
 	useCommand( {
 		name: 'core/toggle-code-editor',
-		label: __( 'Toggle code editor' ),
+		label:
+			editorMode === 'visual'
+				? __( 'Open code editor' )
+				: __( 'Exit code editor' ),
 		icon: code,
 		callback: ( { close } ) => {
 			switchEditorMode( editorMode === 'visual' ? 'text' : 'visual' );
@@ -137,8 +224,7 @@ export default function useCommonCommands() {
 
 	useCommand( {
 		name: 'core/open-preferences',
-		label: __( 'Open editor preferences' ),
-		icon: cog,
+		label: __( 'Editor preferences' ),
 		callback: () => {
 			openModal( PREFERENCES_MODAL_NAME );
 		},
@@ -146,10 +232,63 @@ export default function useCommonCommands() {
 
 	useCommand( {
 		name: 'core/open-shortcut-help',
-		label: __( 'Open keyboard shortcuts' ),
-		icon: keyboardClose,
+		label: __( 'Keyboard shortcuts' ),
+		icon: keyboard,
 		callback: () => {
 			openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
+		},
+	} );
+
+	useCommand( {
+		name: 'core/toggle-breadcrumbs',
+		label: showBlockBreadcrumbs
+			? __( 'Hide block breadcrumbs' )
+			: __( 'Show block breadcrumbs' ),
+		callback: ( { close } ) => {
+			toggle( 'core', 'showBlockBreadcrumbs' );
+			close();
+			createInfoNotice(
+				showBlockBreadcrumbs
+					? __( 'Breadcrumbs hidden.' )
+					: __( 'Breadcrumbs visible.' ),
+				{
+					id: 'core/edit-post/toggle-breadcrumbs/notice',
+					type: 'snackbar',
+				}
+			);
+		},
+	} );
+
+	useCommand( {
+		name: 'core/toggle-publish-sidebar',
+		label: isPublishSidebarEnabled
+			? __( 'Disable pre-publish checks' )
+			: __( 'Enable pre-publish checks' ),
+		icon: formatListBullets,
+		callback: ( { close } ) => {
+			close();
+			toggle( 'core/edit-post', 'isPublishSidebarEnabled' );
+			createInfoNotice(
+				isPublishSidebarEnabled
+					? __( 'Pre-publish checks disabled.' )
+					: __( 'Pre-publish checks enabled.' ),
+				{
+					id: 'core/edit-post/publish-sidebar/notice',
+					type: 'snackbar',
+				}
+			);
+		},
+	} );
+
+	useCommand( {
+		name: 'core/preview-link',
+		label: __( 'Preview in a new tab' ),
+		icon: external,
+		callback: async ( { close } ) => {
+			close();
+			const postId = getCurrentPostId();
+			const link = await __unstableSaveForPreview();
+			window.open( link, `wp-preview-${ postId }` );
 		},
 	} );
 }

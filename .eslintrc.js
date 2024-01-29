@@ -52,13 +52,14 @@ const restrictedImports = [
 			'Please use Reakit API through `@wordpress/components` instead.',
 	},
 	{
+		name: '@ariakit/react',
+		message:
+			'Please use Ariakit API through `@wordpress/components` instead.',
+	},
+	{
 		name: 'redux',
 		importNames: [ 'combineReducers' ],
 		message: 'Please use `combineReducers` from `@wordpress/data` instead.',
-	},
-	{
-		name: 'puppeteer-testing-library',
-		message: '`puppeteer-testing-library` is still experimental.',
 	},
 	{
 		name: '@emotion/css',
@@ -87,6 +88,7 @@ module.exports = {
 	extends: [
 		'plugin:@wordpress/eslint-plugin/recommended',
 		'plugin:eslint-comments/recommended',
+		'plugin:storybook/recommended',
 	],
 	globals: {
 		wp: 'off',
@@ -130,6 +132,13 @@ module.exports = {
 						allowTypeImports: true,
 					},
 				],
+			},
+		],
+		'@typescript-eslint/consistent-type-imports': [
+			'error',
+			{
+				prefer: 'type-imports',
+				disallowTypeAnnotations: false,
 			},
 		],
 		'no-restricted-syntax': [
@@ -286,7 +295,7 @@ module.exports = {
 				'packages/e2e-test-utils-playwright/**/*.[tj]s',
 			],
 			extends: [
-				'plugin:eslint-plugin-playwright/playwright-test',
+				'plugin:@wordpress/eslint-plugin/test-playwright',
 				'plugin:@typescript-eslint/base',
 			],
 			parserOptions: {
@@ -300,7 +309,6 @@ module.exports = {
 			rules: {
 				'@wordpress/no-global-active-element': 'off',
 				'@wordpress/no-global-get-selection': 'off',
-				'playwright/no-page-pause': 'error',
 				'no-restricted-syntax': [
 					'error',
 					{
@@ -319,6 +327,7 @@ module.exports = {
 						message: 'Prefer page.locator instead.',
 					},
 				],
+				'playwright/no-conditional-in-test': 'off',
 				'@typescript-eslint/await-thenable': 'error',
 				'@typescript-eslint/no-floating-promises': 'error',
 				'@typescript-eslint/no-misused-promises': 'error',
@@ -346,6 +355,26 @@ module.exports = {
 				// Useful to add story descriptions via JSDoc without specifying params,
 				// or in TypeScript files where params are likely already documented outside of the JSDoc.
 				'jsdoc/require-param': 'off',
+			},
+		},
+		{
+			files: [ 'packages/components/src/**' ],
+			excludedFiles: [ 'packages/components/src/utils/colors-values.js' ],
+			rules: {
+				'no-restricted-syntax': [
+					'error',
+					{
+						selector: 'Literal[value=/--wp-admin-theme-/]',
+						message:
+							'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+					},
+					{
+						selector:
+							'TemplateElement[value.cooked=/--wp-admin-theme-/]',
+						message:
+							'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+					},
+				],
 			},
 		},
 		{

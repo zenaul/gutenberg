@@ -33,7 +33,7 @@ export function SidebarComplementaryAreaFills() {
 		isEditorSidebarOpened,
 		hasBlockSelection,
 		supportsGlobalStyles,
-		hasPageContentFocus,
+		isEditingPage,
 	} = useSelect( ( select ) => {
 		const _sidebar =
 			select( interfaceStore ).getActiveComplementaryArea( STORE_NAME );
@@ -48,7 +48,7 @@ export function SidebarComplementaryAreaFills() {
 			hasBlockSelection:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			supportsGlobalStyles: ! settings?.supportsTemplatePartsMode,
-			hasPageContentFocus: select( editSiteStore ).hasPageContentFocus(),
+			isEditingPage: select( editSiteStore ).isPage(),
 		};
 	}, [] );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
@@ -60,13 +60,18 @@ export function SidebarComplementaryAreaFills() {
 			return;
 		}
 		if ( hasBlockSelection ) {
-			if ( ! hasPageContentFocus ) {
+			if ( ! isEditingPage ) {
 				enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
 			}
 		} else {
 			enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
 		}
-	}, [ hasBlockSelection, isEditorSidebarOpened, hasPageContentFocus ] );
+	}, [
+		hasBlockSelection,
+		isEditorSidebarOpened,
+		isEditingPage,
+		enableComplementaryArea,
+	] );
 
 	let sidebarName = sidebar;
 	if ( ! isEditorSidebarOpened ) {
@@ -85,11 +90,7 @@ export function SidebarComplementaryAreaFills() {
 			>
 				{ sidebarName === SIDEBAR_TEMPLATE && (
 					<>
-						{ hasPageContentFocus ? (
-							<PagePanels />
-						) : (
-							<TemplatePanel />
-						) }
+						{ isEditingPage ? <PagePanels /> : <TemplatePanel /> }
 						<PluginTemplateSettingPanel.Slot />
 					</>
 				) }

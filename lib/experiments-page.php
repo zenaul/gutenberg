@@ -44,6 +44,18 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
+		'gutenberg-sync-collaboration',
+		__( 'Live Collaboration and offline persistence ', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable the live collaboration and offline persistence between peers', 'gutenberg' ),
+			'id'    => 'gutenberg-sync-collaboration',
+		)
+	);
+
+	add_settings_field(
 		'gutenberg-zoomed-out-view',
 		__( 'Zoomed out view ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -52,6 +64,18 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Test a new zoomed out view on the site editor (Warning: The new feature is not ready. You may experience UX issues that are being addressed)', 'gutenberg' ),
 			'id'    => 'gutenberg-zoomed-out-view',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-dataviews',
+		__( 'New admin views', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test the new views for different entities like pages.', 'gutenberg' ),
+			'id'    => 'gutenberg-dataviews',
 		)
 	);
 
@@ -66,6 +90,17 @@ function gutenberg_initialize_experiments_settings() {
 			'id'    => 'gutenberg-color-randomizer',
 		)
 	);
+	add_settings_field(
+		'gutenberg-form-blocks',
+		__( 'Form and input blocks ', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test new blocks to allow building forms (Warning: The new feature is not ready. You may experience UX issues that are being addressed)', 'gutenberg' ),
+			'id'    => 'gutenberg-form-blocks',
+		)
+	);
 
 	add_settings_field(
 		'gutenberg-group-grid-variation',
@@ -76,18 +111,6 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Test the Grid layout type as a new variation of Group block.', 'gutenberg' ),
 			'id'    => 'gutenberg-group-grid-variation',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-interactivity-api-core-blocks',
-		__( 'Interactivity API and Behaviors UI', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Use the Interactivity API to enable the <a href="https://github.com/WordPress/gutenberg/issues/50029">Behaviors UI</a> in the Image block.', 'gutenberg' ),
-			'id'    => 'gutenberg-interactivity-api-core-blocks',
 		)
 	);
 

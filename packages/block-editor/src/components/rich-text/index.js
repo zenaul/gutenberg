@@ -13,15 +13,13 @@ import {
 	createContext,
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { children as childrenSource } from '@wordpress/blocks';
-import { useInstanceId, useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs } from '@wordpress/compose';
 import {
 	__unstableUseRichText as useRichText,
-	__unstableCreateElement,
 	removeFormat,
 } from '@wordpress/rich-text';
-import deprecated from '@wordpress/deprecated';
 import { Popover } from '@wordpress/components';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -44,8 +42,10 @@ import { useInputEvents } from './use-input-events';
 import { useInsertReplacementText } from './use-insert-replacement-text';
 import { useFirefoxCompat } from './use-firefox-compat';
 import FormatEdit from './format-edit';
-import { getMultilineTag, getAllowedFormats } from './utils';
+import { getAllowedFormats } from './utils';
 import { Content } from './content';
+import { withDeprecations } from './with-deprecations';
+import { unlock } from '../../lock-unlock';
 
 export const keyboardShortcutContext = createContext();
 export const inputEventContext = createContext();
@@ -81,12 +81,12 @@ function removeNativeProps( props ) {
 	return restProps;
 }
 
-function RichTextWrapper(
+export function RichTextWrapper(
 	{
 		children,
 		tagName = 'div',
-		value: originalValue = '',
-		onChange: originalOnChange,
+		value: adjustedValue = '',
+		onChange: adjustedOnChange,
 		isSelected: originalIsSelected,
 		multiline,
 		inlineToolbar,
@@ -100,7 +100,7 @@ function RichTextWrapper(
 		onMerge,
 		onSplit,
 		__unstableOnSplitAtEnd: onSplitAtEnd,
-		__unstableOnSplitMiddle: onSplitMiddle,
+		__unstableOnSplitAtDoubleLineEnd: onSplitAtDoubleLineEnd,
 		identifier,
 		preserveWhiteSpace,
 		__unstablePastePlainText: pastePlainText,
@@ -112,27 +112,27 @@ function RichTextWrapper(
 	},
 	forwardedRef
 ) {
-	if ( multiline ) {
-		deprecated( 'wp.blockEditor.RichText multiline prop', {
-			since: '6.1',
-			version: '6.3',
-			alternative: 'nested blocks (InnerBlocks)',
-			link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/nested-blocks-inner-blocks/',
-		} );
-	}
-
-	const instanceId = useInstanceId( RichTextWrapper );
-
-	identifier = identifier || instanceId;
 	props = removeNativeProps( props );
 
 	const anchorRef = useRef();
-	const { clientId } = useBlockEditContext();
+	const {
+		clientId,
+		isSelected: isBlockSelected,
+		name: blockName,
+	} = useBlockEditContext();
 	const selector = ( select ) => {
-		const { getSelectionStart, getSelectionEnd } =
+		// Avoid subscribing to the block editor store if the block is not
+		// selected.
+		if ( ! isBlockSelected ) {
+			return { isSelected: false };
+		}
+
+		const { getSelectionStart, getSelectionEnd, getBlockAttributes } =
 			select( blockEditorStore );
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
+		const blockBindings =
+			getBlockAttributes( clientId )?.metadata?.bindings;
 
 		let isSelected;
 
@@ -145,46 +145,53 @@ function RichTextWrapper(
 			isSelected = selectionStart.clientId === clientId;
 		}
 
+		// Disable Rich Text editing if block bindings specify that.
+		let shouldDisableEditing = false;
+		if ( blockBindings ) {
+			const blockTypeAttributes = getBlockType( blockName ).attributes;
+			const { getBlockBindingsSource } = unlock(
+				select( blockEditorStore )
+			);
+			for ( const [ attribute, args ] of Object.entries(
+				blockBindings
+			) ) {
+				// If any of the attributes with source "rich-text" is part of the bindings,
+				// has a source with `lockAttributesEditing`, disable it.
+				if (
+					blockTypeAttributes?.[ attribute ]?.source ===
+						'rich-text' &&
+					getBlockBindingsSource( args.source.name )
+						?.lockAttributesEditing
+				) {
+					shouldDisableEditing = true;
+					break;
+				}
+			}
+		}
+
 		return {
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
+			shouldDisableEditing,
 		};
 	};
-	// This selector must run on every render so the right selection state is
-	// retreived from the store on merge.
-	// To do: fix this somehow.
-	const { selectionStart, selectionEnd, isSelected } = useSelect( selector );
+	const { selectionStart, selectionEnd, isSelected, shouldDisableEditing } =
+		useSelect( selector, [
+			clientId,
+			identifier,
+			originalIsSelected,
+			isBlockSelected,
+		] );
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
-	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
 		disableFormats,
 	} );
 	const hasFormats =
 		! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
-	let adjustedValue = originalValue;
-	let adjustedOnChange = originalOnChange;
-
-	// Handle deprecated format.
-	if ( Array.isArray( originalValue ) ) {
-		deprecated( 'wp.blockEditor.RichText value prop as children type', {
-			since: '6.1',
-			version: '6.3',
-			alternative: 'value prop as string',
-			link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
-		} );
-
-		adjustedValue = childrenSource.toHTML( originalValue );
-		adjustedOnChange = ( newValue ) =>
-			originalOnChange(
-				childrenSource.fromDOM(
-					__unstableCreateElement( document, newValue ).childNodes
-				)
-			);
-	}
 
 	const onSelectionChange = useCallback(
 		( start, end ) => {
@@ -293,7 +300,6 @@ function RichTextWrapper(
 		onSelectionChange,
 		placeholder,
 		__unstableIsSelected: isSelected,
-		__unstableMultilineTag: multilineTag,
 		__unstableDisableFormats: disableFormats,
 		preserveWhiteSpace,
 		__unstableDependencies: [ ...dependencies, tagName ],
@@ -353,10 +359,13 @@ function RichTextWrapper(
 				{ ...props }
 				{ ...autocompleteProps }
 				ref={ useMergeRefs( [
+					// Rich text ref must be first because its focus listener
+					// must be set up before any other ref calls .focus() on
+					// mount.
+					richTextRef,
 					forwardedRef,
 					autocompleteProps.ref,
 					props.ref,
-					richTextRef,
 					useBeforeInputRules( { value, onChange } ),
 					useInputRules( {
 						getValue,
@@ -380,10 +389,7 @@ function RichTextWrapper(
 						tagName,
 						onReplace,
 						onSplit,
-						onSplitMiddle,
 						__unstableEmbedURLOnPaste,
-						multilineTag,
-						preserveWhiteSpace,
 						pastePlainText,
 					} ),
 					useDelete( {
@@ -396,28 +402,41 @@ function RichTextWrapper(
 						value,
 						onReplace,
 						onSplit,
-						onSplitMiddle,
-						multilineTag,
 						onChange,
 						disableLineBreaks,
 						onSplitAtEnd,
+						onSplitAtDoubleLineEnd,
 					} ),
-					useFirefoxCompat( { value, onChange } ),
+					useFirefoxCompat(),
 					anchorRef,
 				] ) }
-				contentEditable={ true }
+				contentEditable={ ! shouldDisableEditing }
 				suppressContentEditableWarning={ true }
 				className={ classnames(
 					'block-editor-rich-text__editable',
 					props.className,
 					'rich-text'
 				) }
+				// Setting tabIndex to 0 is unnecessary, the element is already
+				// focusable because it's contentEditable. This also fixes a
+				// Safari bug where it's not possible to Shift+Click multi
+				// select blocks when Shift Clicking into an element with
+				// tabIndex because Safari will focus the element. However,
+				// Safari will correctly ignore nested contentEditable elements.
+				tabIndex={
+					props.tabIndex === 0 && ! shouldDisableEditing
+						? null
+						: props.tabIndex
+				}
+				data-wp-block-attribute-key={ identifier }
 			/>
 		</>
 	);
 }
 
-const ForwardedRichTextContainer = forwardRef( RichTextWrapper );
+const ForwardedRichTextContainer = withDeprecations(
+	forwardRef( RichTextWrapper )
+);
 
 ForwardedRichTextContainer.Content = Content;
 ForwardedRichTextContainer.isEmpty = ( value ) => {
