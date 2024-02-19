@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useContext } from '@wordpress/element';
 import {
 	__experimentalText as Text,
 	__experimentalHeading as Heading,
@@ -12,6 +13,12 @@ import {
 	FlexBlock,
 } from '@wordpress/components';
 import { chevronLeft } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { FontLibraryContext } from './context';
 
 function TabPanelLayout( {
 	title,
@@ -21,6 +28,8 @@ function TabPanelLayout( {
 	children,
 	footer,
 } ) {
+	const { setNotice } = useContext( FontLibraryContext );
+
 	return (
 		<div className="font-library-modal__tabpanel-layout">
 			<Spacer margin={ 4 } />
@@ -33,6 +42,7 @@ function TabPanelLayout( {
 								onClick={ handleBack }
 								icon={ chevronLeft }
 								size="small"
+								label={ __( 'Back' ) }
 							/>
 						) }
 						{ title && (
@@ -51,7 +61,7 @@ function TabPanelLayout( {
 							<Spacer margin={ 1 } />
 							<Notice
 								status={ notice.type }
-								onRemove={ notice.onRemove }
+								onRemove={ () => setNotice( null ) }
 							>
 								{ notice.message }
 							</Notice>

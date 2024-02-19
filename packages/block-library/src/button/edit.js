@@ -238,16 +238,15 @@ function ButtonEdit( props ) {
 				return {};
 			}
 
-			const { getBlockBindingsSource } = unlock(
+			const blockBindingsSource = unlock(
 				select( blockEditorStore )
-			);
+			).getBlockBindingsSource( metadata?.bindings?.url?.source );
 
 			return {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
-					getBlockBindingsSource(
-						metadata?.bindings?.url?.source?.name
-					)?.lockAttributesEditing === true,
+					( ! blockBindingsSource ||
+						blockBindingsSource?.lockAttributesEditing ),
 			};
 		},
 		[ isSelected ]

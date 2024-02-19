@@ -7,10 +7,10 @@ import {
 	ResizableBox,
 	Spinner,
 	TextareaControl,
-	ToggleControl,
 	TextControl,
 	ToolbarButton,
 	ToolbarGroup,
+	Dropdown,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -26,10 +26,12 @@ import {
 	useSettings,
 	__experimentalImageEditor as ImageEditor,
 	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
+import { DOWN } from '@wordpress/keycodes';
 import { getFilename } from '@wordpress/url';
 import { switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
@@ -177,6 +179,7 @@ export default function Image( {
 	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const hasNonContentControls = blockEditingMode === 'default';
+	const isContentOnlyMode = blockEditingMode === 'contentOnly';
 	const isResizable =
 		allowResize &&
 		hasNonContentControls &&
@@ -255,6 +258,22 @@ export default function Image( {
 		setAttributes( props );
 	}
 
+	function onSetLightbox( enable ) {
+		if ( enable && ! lightboxSetting?.enabled ) {
+			setAttributes( {
+				lightbox: { enabled: true },
+			} );
+		} else if ( ! enable && lightboxSetting?.enabled ) {
+			setAttributes( {
+				lightbox: { enabled: false },
+			} );
+		} else {
+			setAttributes( {
+				lightbox: undefined,
+			} );
+		}
+	}
+
 	function onSetTitle( value ) {
 		// This is the HTML title attribute, separate from the media object
 		// title.
@@ -328,14 +347,11 @@ export default function Image( {
 
 	const [ lightboxSetting ] = useSettings( 'lightbox' );
 
-	const showLightboxToggle =
+	const showLightboxSetting =
 		!! lightbox || lightboxSetting?.allowEditing === true;
 
 	const lightboxChecked =
 		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
-
-	const lightboxToggleDisabled =
-		linkDestination && linkDestination !== 'none';
 
 	const dimensionsControl = (
 		<DimensionsTool
@@ -392,6 +408,7 @@ export default function Image( {
 
 	const {
 		lockUrlControls = false,
+		lockHrefControls = false,
 		lockAltControls = false,
 		lockTitleControls = false,
 	} = useSelect(
@@ -400,47 +417,67 @@ export default function Image( {
 				return {};
 			}
 
-			const { getBlockBindingsSource } = unlock(
-				select( blockEditorStore )
-			);
+			const { getBlockBindingsSource, getBlockParentsByBlockName } =
+				unlock( select( blockEditorStore ) );
 			const {
 				url: urlBinding,
 				alt: altBinding,
 				title: titleBinding,
 			} = metadata?.bindings || {};
+			const hasParentPattern =
+				getBlockParentsByBlockName( clientId, 'core/block' ).length > 0;
+			const urlBindingSource = getBlockBindingsSource(
+				urlBinding?.source
+			);
+			const altBindingSource = getBlockBindingsSource(
+				altBinding?.source
+			);
+			const titleBindingSource = getBlockBindingsSource(
+				titleBinding?.source
+			);
 			return {
 				lockUrlControls:
 					!! urlBinding &&
-					getBlockBindingsSource( urlBinding?.source?.name )
-						?.lockAttributesEditing === true,
+					( ! urlBindingSource ||
+						urlBindingSource?.lockAttributesEditing ),
+				lockHrefControls:
+					// Disable editing the link of the URL if the image is inside a pattern instance.
+					// This is a temporary solution until we support overriding the link on the frontend.
+					hasParentPattern,
 				lockAltControls:
 					!! altBinding &&
-					getBlockBindingsSource( altBinding?.source?.name )
-						?.lockAttributesEditing === true,
+					( ! altBindingSource ||
+						altBindingSource?.lockAttributesEditing ),
 				lockTitleControls:
 					!! titleBinding &&
-					getBlockBindingsSource( titleBinding?.source?.name )
-						?.lockAttributesEditing === true,
+					( ! titleBindingSource ||
+						titleBindingSource?.lockAttributesEditing ),
 			};
 		},
-		[ isSingleSelected ]
+		[ clientId, isSingleSelected, metadata?.bindings ]
 	);
 
 	const controls = (
 		<>
 			<BlockControls group="block">
-				{ isSingleSelected && ! isEditingImage && ! lockUrlControls && (
-					<ImageURLInputUI
-						url={ href || '' }
-						onChangeUrl={ onSetHref }
-						linkDestination={ linkDestination }
-						mediaUrl={ ( image && image.source_url ) || url }
-						mediaLink={ image && image.link }
-						linkTarget={ linkTarget }
-						linkClass={ linkClass }
-						rel={ rel }
-					/>
-				) }
+				{ isSingleSelected &&
+					! isEditingImage &&
+					! lockHrefControls &&
+					! lockUrlControls && (
+						<ImageURLInputUI
+							url={ href || '' }
+							onChangeUrl={ onSetHref }
+							linkDestination={ linkDestination }
+							mediaUrl={ ( image && image.source_url ) || url }
+							mediaLink={ image && image.link }
+							linkTarget={ linkTarget }
+							linkClass={ linkClass }
+							rel={ rel }
+							showLightboxSetting={ showLightboxSetting }
+							lightboxEnabled={ lightboxChecked }
+							onSetLightbox={ onSetLightbox }
+						/>
+					) }
 				{ allowCrop && (
 					<ToolbarButton
 						onClick={ () => setIsEditingImage( true ) }
@@ -475,9 +512,116 @@ export default function Image( {
 						<ToolbarButton
 							onClick={ uploadExternal }
 							icon={ upload }
-							label={ __( 'Upload image to media library' ) }
+							label={ __( 'Upload to Media Library' ) }
 						/>
 					</ToolbarGroup>
+				</BlockControls>
+			) }
+			{ isContentOnlyMode && (
+				// Add some extra controls for content attributes when content only mode is active.
+				// With content only mode active, the inspector is hidden, so users need another way
+				// to edit these attributes.
+				<BlockControls group="other">
+					<Dropdown
+						popoverProps={ { position: 'bottom right' } }
+						renderToggle={ ( { isOpen, onToggle } ) => (
+							<ToolbarButton
+								onClick={ onToggle }
+								aria-haspopup="true"
+								aria-expanded={ isOpen }
+								onKeyDown={ ( event ) => {
+									if ( ! isOpen && event.keyCode === DOWN ) {
+										event.preventDefault();
+										onToggle();
+									}
+								} }
+							>
+								{ _x(
+									'Alt',
+									'Alternative text for an image. Block toolbar label, a low character count is preferred.'
+								) }
+							</ToolbarButton>
+						) }
+						renderContent={ () => (
+							<TextareaControl
+								className="wp-block-image__toolbar_content_textarea"
+								label={ __( 'Alternative text' ) }
+								value={ alt || '' }
+								onChange={ updateAlt }
+								disabled={ lockAltControls }
+								help={
+									lockAltControls ? (
+										<>
+											{ __(
+												'Connected to a custom field'
+											) }
+										</>
+									) : (
+										<>
+											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+												{ __(
+													'Describe the purpose of the image.'
+												) }
+											</ExternalLink>
+											<br />
+											{ __(
+												'Leave empty if decorative.'
+											) }
+										</>
+									)
+								}
+								__nextHasNoMarginBottom
+							/>
+						) }
+					/>
+					<Dropdown
+						popoverProps={ { position: 'bottom right' } }
+						renderToggle={ ( { isOpen, onToggle } ) => (
+							<ToolbarButton
+								onClick={ onToggle }
+								aria-haspopup="true"
+								aria-expanded={ isOpen }
+								onKeyDown={ ( event ) => {
+									if ( ! isOpen && event.keyCode === DOWN ) {
+										event.preventDefault();
+										onToggle();
+									}
+								} }
+							>
+								{ __( 'Title' ) }
+							</ToolbarButton>
+						) }
+						renderContent={ () => (
+							<TextControl
+								className="wp-block-image__toolbar_content_textarea"
+								__nextHasNoMarginBottom
+								label={ __( 'Title attribute' ) }
+								value={ title || '' }
+								onChange={ onSetTitle }
+								disabled={ lockTitleControls }
+								help={
+									lockTitleControls ? (
+										<>
+											{ __(
+												'Connected to a custom field'
+											) }
+										</>
+									) : (
+										<>
+											{ __(
+												'Describe the role of this image on the page.'
+											) }
+											<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
+												{ __(
+													'(Note: many devices and browsers do not display this text.)'
+												) }
+											</ExternalLink>
+										</>
+									)
+								}
+							/>
+						) }
+					/>
 				</BlockControls>
 			) }
 			<InspectorControls>
@@ -499,7 +643,7 @@ export default function Image( {
 								label={ __( 'Alternative text' ) }
 								value={ alt || '' }
 								onChange={ updateAlt }
-								disabled={ lockAltControls }
+								readOnly={ lockAltControls }
 								help={
 									lockAltControls ? (
 										<>
@@ -533,34 +677,6 @@ export default function Image( {
 							options={ imageSizeOptions }
 						/>
 					) }
-					{ showLightboxToggle && (
-						<ToolsPanelItem
-							hasValue={ () => !! lightbox }
-							label={ __( 'Expand on click' ) }
-							onDeselect={ () => {
-								setAttributes( { lightbox: undefined } );
-							} }
-							isShownByDefault={ true }
-						>
-							<ToggleControl
-								label={ __( 'Expand on click' ) }
-								checked={ lightboxChecked }
-								onChange={ ( newValue ) => {
-									setAttributes( {
-										lightbox: { enabled: newValue },
-									} );
-								} }
-								disabled={ lightboxToggleDisabled }
-								help={
-									lightboxToggleDisabled
-										? __(
-												'“Expand on click” scales the image up, and can’t be combined with a link.'
-										  )
-										: ''
-								}
-							/>
-						</ToolsPanelItem>
-					) }
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
@@ -569,7 +685,7 @@ export default function Image( {
 					label={ __( 'Title attribute' ) }
 					value={ title || '' }
 					onChange={ onSetTitle }
-					disabled={ lockTitleControls }
+					readOnly={ lockTitleControls }
 					help={
 						lockTitleControls ? (
 							<>{ __( 'Connected to a custom field' ) }</>
@@ -607,6 +723,7 @@ export default function Image( {
 	}
 
 	const borderProps = useBorderProps( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
 	const isRounded = attributes.className?.includes( 'is-style-rounded' );
 
 	let img = (
@@ -633,6 +750,7 @@ export default function Image( {
 						( width && height ) || aspectRatio ? '100%' : undefined,
 					objectFit: scale,
 					...borderProps.style,
+					...shadowProps.style,
 				} }
 			/>
 			{ temporaryURL && <Spinner /> }

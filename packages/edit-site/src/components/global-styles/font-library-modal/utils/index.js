@@ -9,7 +9,7 @@ import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
 import { unlock } from '../../../../lock-unlock';
 import { fetchInstallFontFace } from '../resolvers';
-import { formatFontFamily } from './preview-styles';
+import { formatFontFaceName } from './preview-styles';
 
 /**
  * Browser dependencies
@@ -99,7 +99,7 @@ export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
 	}
 
 	const newFont = new window.FontFace(
-		formatFontFamily( fontFace.fontFamily ),
+		formatFontFaceName( fontFace.fontFamily ),
 		dataSource,
 		{
 			style: fontFace.fontStyle,
@@ -161,7 +161,8 @@ export function makeFontFamilyFormData( fontFamily ) {
 
 export function makeFontFacesFormData( font ) {
 	if ( font?.fontFace ) {
-		const fontFacesFormData = font.fontFace.map( ( face, faceIndex ) => {
+		const fontFacesFormData = font.fontFace.map( ( item, faceIndex ) => {
+			const face = { ...item };
 			const formData = new FormData();
 			if ( face.file ) {
 				// Normalize to an array, since face.file may be a single file or an array of files.
