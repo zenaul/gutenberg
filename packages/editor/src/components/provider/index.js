@@ -25,6 +25,14 @@ import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
 import NavigationBlockEditingMode from './navigation-block-editing-mode';
 import { useHideBlocksFromInserter } from './use-hide-blocks-from-inserter';
 import useCommands from '../commands';
+import BlockRemovalWarnings from '../block-removal-warnings';
+import StartPageOptions from '../start-page-options';
+import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
+import ContentOnlySettingsMenu from '../block-settings-menu/content-only-settings-menu';
+import StartTemplateOptions from '../start-template-options';
+import EditorKeyboardShortcuts from '../global-keyboard-shortcuts';
+import PatternRenameModal from '../pattern-rename-modal';
+import PatternDuplicateModal from '../pattern-duplicate-modal';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -166,7 +174,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		const blockEditorSettings = useBlockEditorSettings(
 			editorSettings,
 			type,
-			id
+			id,
+			mode
 		);
 		const [ blocks, onInput, onChange ] = useBlockEditorProps(
 			post,
@@ -231,7 +240,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setRenderingMode( settings.defaultRenderingMode ?? 'post-only' );
 		}, [ settings.defaultRenderingMode, setRenderingMode ] );
 
-		useHideBlocksFromInserter( post.type );
+		useHideBlocksFromInserter( post.type, mode );
 
 		// Register the editor commands.
 		useCommands();
@@ -257,12 +266,24 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							useSubRegistry={ false }
 						>
 							{ children }
-							<PatternsMenuItems />
-							{ mode === 'template-locked' && (
-								<DisableNonPageContentBlocks />
-							) }
-							{ type === 'wp_navigation' && (
-								<NavigationBlockEditingMode />
+							{ ! settings.__unstableIsPreviewMode && (
+								<>
+									<PatternsMenuItems />
+									<ContentOnlySettingsMenu />
+									{ mode === 'template-locked' && (
+										<DisableNonPageContentBlocks />
+									) }
+									{ type === 'wp_navigation' && (
+										<NavigationBlockEditingMode />
+									) }
+									<EditorKeyboardShortcuts />
+									<KeyboardShortcutHelpModal />
+									<BlockRemovalWarnings />
+									<StartPageOptions />
+									<StartTemplateOptions />
+									<PatternRenameModal />
+									<PatternDuplicateModal />
+								</>
 							) }
 						</BlockEditorProviderComponent>
 					</BlockContextProvider>
